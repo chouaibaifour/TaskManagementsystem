@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 ﻿
+=======
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+>>>>>>> dc5a56ad8758bf8e00faf6b3692e0580510c7134
 using TaskManagement.Domain.Projects.ObjectValues;
 using TaskManagement.Domain.Tasks.Value_Objects;
 using TaskManagement.Domain.Users.ObjectValues;
@@ -70,7 +78,10 @@ namespace TaskManagement.Domain.Projects
             if(newRole == MemberRole.Owner)
                 throw new Exception("Cannot assign Owner role to a member");
             Role = newRole;
+<<<<<<< HEAD
             
+=======
+>>>>>>> dc5a56ad8758bf8e00faf6b3692e0580510c7134
         }
         public void AssignTask(TaskId taskId)
         {

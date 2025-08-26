@@ -160,7 +160,7 @@ namespace TaskManagement.Domain.Projects
                 throw new Exception("User is not a deactivated member of the project");
             member.Activate();
         }
-
+         
         public void ChangeMemberRole(UserId userId, MemberRole role)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
