@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagement.Domain.Projects.ValueObjects
+namespace TaskManagement.Domain.Tasks.ValueObjects
 {
     internal class Priority
     {
@@ -51,9 +51,9 @@ namespace TaskManagement.Domain.Projects.ValueObjects
         }
 
         public static bool operator ==(Priority a, Priority b) =>
-            (ReferenceEquals(a, b) ||
-            (a is not null && b is not null)
-            && a?.Number == b?.Number);
+            ReferenceEquals(a, b) ||
+            a is not null && b is not null
+            && a?.Number == b?.Number;
 
         public static bool operator !=(Priority a, Priority b) => !(a == b);
 
