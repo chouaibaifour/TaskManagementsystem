@@ -9,6 +9,9 @@
   <ItemGroup>
     <Folder Include="Projects\Enums\" />
     <Folder Include="Projects\Policies\" />
+    <Folder Include="Tasks\Events\" />
+    <Folder Include="Tasks\Enums\" />
+    <Folder Include="Tasks\Services\" />
   </ItemGroup>
 
 </Project>

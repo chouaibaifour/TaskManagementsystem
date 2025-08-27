@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using TaskManagement.Domain.Users.Policies;
-namespace TaskManagement.Domain.Users.ObjectValues
+namespace TaskManagement.Domain.Users.ValueObjects
 {
    public sealed class PasswordHash
     {

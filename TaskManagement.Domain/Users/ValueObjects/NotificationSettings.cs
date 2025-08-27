@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagement.Domain.Users.ObjectValues
+namespace TaskManagement.Domain.Users.ValueObjects
 {
     public sealed class NotificationSettings
     {

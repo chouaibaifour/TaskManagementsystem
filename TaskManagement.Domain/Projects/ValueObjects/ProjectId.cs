@@ -1,7 +1,7 @@
 ﻿
 
 
-namespace TaskManagement.Domain.Projects.ObjectValues
+namespace TaskManagement.Domain.Projects.ValueObjects
 {
     public readonly record struct ProjectId(Guid Value)
     {

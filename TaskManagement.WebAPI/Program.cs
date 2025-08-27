@@ -19,8 +19,7 @@ builder.Services.AddSwaggerGen();
 
 // Register application services
 builder.Services.AddApplication();
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(AssemblyMarker).Assembly));
+
 
 // Infrastructure layer (Repositories, Security, FileStorage, etc.)
 builder.Services.AddInfrastructure(configuration);

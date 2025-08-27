@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskManagement.Domain.Users.ObjectValues;
+using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Domain.Users.Events
 {

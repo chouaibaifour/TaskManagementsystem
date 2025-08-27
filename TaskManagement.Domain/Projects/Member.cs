@@ -1,7 +1,8 @@
 
-using TaskManagement.Domain.Projects.ObjectValues;
-using TaskManagement.Domain.Tasks.Value_Objects;
-using TaskManagement.Domain.Users.ObjectValues;
+
+using TaskManagement.Domain.Projects.ValueObjects;
+using TaskManagement.Domain.Tasks.ValueObjects;
+using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Domain.Projects
 {

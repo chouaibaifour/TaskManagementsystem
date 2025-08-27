@@ -2,7 +2,7 @@
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Primitives;
 using TaskManagement.Domain.Users.Enums;
-using TaskManagement.Domain.Users.ObjectValues;
+using TaskManagement.Domain.Users.ValueObjects;
 using TaskManagement.Domain.Users.Policies;
 using TaskManagement.Domain.Users.Events;
 using TaskManagement.Domain.Users.Services;

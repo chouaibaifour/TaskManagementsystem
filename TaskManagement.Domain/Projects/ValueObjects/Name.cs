@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagement.Domain.Projects.ObjectValues
+namespace TaskManagement.Domain.Projects.ValueObjects
 {
     // project name must not be empty or whitespace and unique per user/team
     public sealed class Name

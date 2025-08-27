@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace TaskManagement.Domain.Users.ObjectValues
+namespace TaskManagement.Domain.Users.ValueObjects
 {
     public sealed class Email
     {
@@ -54,6 +54,11 @@ namespace TaskManagement.Domain.Users.ObjectValues
             }
 
             return obj is Email email && this == email;
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
         }
     }
 }
