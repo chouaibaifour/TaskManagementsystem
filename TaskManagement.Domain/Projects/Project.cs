@@ -1,5 +1,6 @@
 ﻿
 using TaskManagement.Domain.Common.Primitives;
+using TaskManagement.Domain.Common.Primitives.ValueObject;
 using TaskManagement.Domain.Projects.Events;
 using TaskManagement.Domain.Projects.Events.ProjectMember;
 using TaskManagement.Domain.Projects.ValueObjects;
@@ -10,10 +11,10 @@ namespace TaskManagement.Domain.Projects
 {
     public class Project:AggregateRoot<ProjectId>
     {
-        public Name Name { get; private set; }
+        public ProjectName Name { get; private set; }
         public Description Description { get; private set; }
         public UserId OwnerId { get; private set; }
-        public Status Status { get; private set; } = Status.Default;
+        public ProjectStatus Status { get; private set; } = ProjectStatus.Default;
         public DateTime CreatedAtUtc { get; private set; }
         public DateTime? UpdateAtUtc { get; private set; }
         public List<Member> _members { get; private set; } = new List<Member>(13);
@@ -22,10 +23,10 @@ namespace TaskManagement.Domain.Projects
 
         private Project(
             ProjectId id,
-            Name name,
+            ProjectName name,
             Description description,
             UserId ownerId,
-            Status status,
+            ProjectStatus status,
             DateTime createdAtUtc,
             
             List<Member> members)
@@ -41,7 +42,7 @@ namespace TaskManagement.Domain.Projects
         }
         public static Project Create
         (
-            Name name,
+            ProjectName name,
             Description description,
             UserId ownerId,
             DateTime nowUtc)
@@ -52,7 +53,7 @@ namespace TaskManagement.Domain.Projects
                 name,
                 description,
                 ownerId,
-                Status.Default,
+                ProjectStatus.Default,
                 nowUtc,
                 
                 new List<Member>
@@ -64,7 +65,7 @@ namespace TaskManagement.Domain.Projects
         private void Touch(DateTime nowUtc) =>
             UpdateAtUtc = nowUtc;
 
-        public void UpdateDetails(Name name, Description description,DateTime nowUtc)
+        public void UpdateDetails(ProjectName name, Description description,DateTime nowUtc)
         {
             Name = name;
             Description = description;
@@ -74,7 +75,7 @@ namespace TaskManagement.Domain.Projects
         public void ReActivate(DateTime nowUtc)
         {
           
-            if (Status == Status.Active)
+            if (Status == ProjectStatus.Active)
                 return;
 
             Status = Status.ReActivte();
@@ -85,7 +86,7 @@ namespace TaskManagement.Domain.Projects
         public void Archive(DateTime nowUtc)
         {
             
-            if (Status.Archived == Status)
+            if (ProjectStatus.Archived == Status)
                 return;
             Status = Status.Archive();
             Touch(nowUtc);
@@ -95,7 +96,7 @@ namespace TaskManagement.Domain.Projects
         public void Complete(DateTime nowUtc)
         {
             
-            if (Status.Completed == Status)
+            if (ProjectStatus.Completed == Status)
                 return;
             Status = Status.Complete();
             Touch(nowUtc);

@@ -76,10 +76,10 @@ namespace TaskManagement.Domain.Common.Errors
                                                 "Project description is Required.");
 
             public static readonly DomainError InvalidStatusTransition =
-                                new DomainError("Project.Status.InvalidTransition",
+                                new DomainError("Project.ProjectStatus.InvalidTransition",
                                                 "Project status transition is invalid.");
             public static readonly DomainError ProjectStatusRequired =
-                                new DomainError("Project.Status.Required",
+                                new DomainError("Project.ProjectStatus.Required",
                                                 "Project status is required.");
 
         }
