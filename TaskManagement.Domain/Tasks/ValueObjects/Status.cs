@@ -7,18 +7,18 @@ using TaskManagement.Domain.Projects.ValueObjects;
 
 namespace TaskManagement.Domain.Tasks.ValueObjects
 {
-    public sealed class TaskStatus
+    public sealed class Status
     {
         public string Value { get; private set; }
         public byte Number { get; private set; }
         public string Display => Value;
 
-        public static TaskStatus Todo => new("To do", 1);
-        public static TaskStatus InProgress => new("InProgress", 2);
-        public static TaskStatus Completed => new("Completed", 3);
-        public static TaskStatus Default => Todo;
+        public static Status Todo => new("To do", 1);
+        public static Status InProgress => new("InProgress", 2);
+        public static Status Completed => new("Completed", 3);
+        public static Status Default => Todo;
 
-        private TaskStatus(string value, byte number)
+        private Status(string value, byte number)
         {
 
             AgainstNullOrWhiteSpace(value);
@@ -39,39 +39,34 @@ namespace TaskManagement.Domain.Tasks.ValueObjects
                 throw new ArgumentException("TaskStatus number must be (ie.1..3)");
         }
 
-        public TaskStatus ReDo()
-        {
-            if (this == InProgress && this != Completed)
-                return Todo;
-            return this;
-        }
+        
 
-        public TaskStatus SetInProgress()
-        {
-            if (this != InProgress && this != Completed)
-                return InProgress;
-            return this;
-        }
-
-        public TaskStatus Complete()
-        {
-            if (this == Todo && this != InProgress)
-                return Completed;
-            return this;
-        }
-
-        public static bool operator ==(TaskStatus a, TaskStatus b) =>
+        public static bool operator ==(Status a, Status b) =>
             (ReferenceEquals(a, b) || 
             (a is not null && b is not null) 
             && a?.Number == b?.Number);
 
-        public static bool operator !=(TaskStatus a, TaskStatus b) => !(a == b);
+        public static bool operator !=(Status a, Status b) => !(a == b);
 
         public override string ToString() => Display;
 
         public override bool Equals(object? obj) => 
-            obj is TaskStatus status && Number == status.Number;
+            obj is Status status && Number == status.Number;
 
         public override int GetHashCode() => HashCode.Combine(Value, Number);
+
+        internal bool CanTransitionTo(Status newStatus)
+        {
+            if (this == newStatus)
+                return true;
+            if (this == Todo&&newStatus==InProgress)
+                return true;
+            if(this==InProgress&&newStatus==Completed)
+                return true;
+            if (this==Completed&&newStatus==Todo)
+                return true;
+            return false;
+
+        }
     }
 }

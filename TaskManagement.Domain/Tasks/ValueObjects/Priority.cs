@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Domain.Tasks.ValueObjects
 {
-    internal class Priority
+   public sealed class Priority
     {
         public string Value { get; private set; }
         public byte Number { get; private set; }
@@ -29,26 +29,7 @@ namespace TaskManagement.Domain.Tasks.ValueObjects
             Number = number;
         }
 
-        public Priority SetLow()
-        {
-            if (this == Meduim && this != High)
-                return Low;
-            return this;
-        }
-
-        public Priority SetMeduim()
-        {
-            if (this != Meduim && this != High)
-                return Meduim;
-            return this;
-        }
-
-        public Priority SetHigh()
-        {
-            if (this == Low && this != Meduim)
-                return High;
-            return this;
-        }
+        
 
         public static bool operator ==(Priority a, Priority b) =>
             ReferenceEquals(a, b) ||

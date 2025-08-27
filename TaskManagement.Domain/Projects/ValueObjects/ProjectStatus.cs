@@ -63,5 +63,9 @@ namespace TaskManagement.Domain.Projects.ValueObjects
 
         public override int GetHashCode() => HashCode.Combine(Value, Number);
 
+        internal bool CanTransitionTo(ProjectStatus newStatus)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

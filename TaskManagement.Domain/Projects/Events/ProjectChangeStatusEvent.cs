@@ -7,6 +7,7 @@ using TaskManagement.Domain.Projects.ValueObjects;
 
 namespace TaskManagement.Domain.Projects.Events
 {
-    public sealed record ProjectArchivedEvent(ProjectId ProjectId, DateTime OccurrdAtUtc);
-    
+   public sealed record ProjectChangeStatusEvent
+        (ProjectId ProjectId,ProjectStatus oldStatus, ProjectStatus newStatus, DateTime OccurrdAtUtc);
+
 }

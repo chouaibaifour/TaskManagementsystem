@@ -1,6 +1,7 @@
 ﻿
 using TaskManagement.Domain.Common.Primitives;
 using TaskManagement.Domain.Common.Primitives.ValueObject;
+using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Projects.Events;
 using TaskManagement.Domain.Projects.Events.ProjectMember;
 using TaskManagement.Domain.Projects.ValueObjects;
@@ -17,7 +18,7 @@ namespace TaskManagement.Domain.Projects
         public ProjectStatus Status { get; private set; } = ProjectStatus.Default;
         public DateTime CreatedAtUtc { get; private set; }
         public DateTime? UpdateAtUtc { get; private set; }
-        public List<Member> _members { get; private set; } = new List<Member>(13);
+        private List<Member> _members  = new List<Member>(13);
 
         public IReadOnlyCollection<Member> Members => _members.AsReadOnly();
 
@@ -28,7 +29,6 @@ namespace TaskManagement.Domain.Projects
             UserId ownerId,
             ProjectStatus status,
             DateTime createdAtUtc,
-            
             List<Member> members)
         {
             Id = id;
@@ -40,15 +40,18 @@ namespace TaskManagement.Domain.Projects
            
             _members = members;
         }
+
         public static Project Create
         (
             ProjectName name,
             Description description,
             UserId ownerId,
-            DateTime nowUtc)
+            IClock clock)
         {
 
-            return new Project(
+            var nowUtc = clock.UtcNow;
+
+            var project= new Project(
                 ProjectId.New(),
                 name,
                 description,
@@ -60,49 +63,39 @@ namespace TaskManagement.Domain.Projects
                 {
                     Member.Create(ownerId,MemberRole.Owner,nowUtc)
                 });
+
+            project.Raise(new ProjectCreatedEvent(project.Id, project.OwnerId, nowUtc));
+
+            return project;
         }
 
-        private void Touch(DateTime nowUtc) =>
-            UpdateAtUtc = nowUtc;
+        private void Touch(IClock clock) =>
+            UpdateAtUtc = clock.UtcNow;
 
-        public void UpdateDetails(ProjectName name, Description description,DateTime nowUtc)
+        public void UpdateDetails(ProjectName name, Description description,IClock clock)
         {
             Name = name;
             Description = description;
-            Touch(nowUtc);
+            Touch(clock);
         }
 
-        public void ReActivate(DateTime nowUtc)
+        
+        public void Complete(IClock clock) => updateProjectStatus(ProjectStatus.Completed,clock);
+        public void Archive(IClock clock) => updateProjectStatus(ProjectStatus.Archived, clock);
+        public void ReActivate(IClock clock) => updateProjectStatus(ProjectStatus.Completed,clock);
+        
+        private void updateProjectStatus(ProjectStatus newStatus,IClock clock)
         {
-          
-            if (Status == ProjectStatus.Active)
-                return;
-
-            Status = Status.ReActivte();
-            Touch(nowUtc);
-
-            Raise(new ProjectReActivateEvent(Id, nowUtc));
+            if (!Status.CanTransitionTo(newStatus))
+                throw new InvalidOperationException(
+                    $"can not transit Status from {Status.Display} to {newStatus.Display}."
+                    );
+            var oldStatus = Status;
+            Status = newStatus;
+            Touch(clock);
+            //Raise(new ProjectChangeStatusEvent());
         }
-        public void Archive(DateTime nowUtc)
-        {
-            
-            if (ProjectStatus.Archived == Status)
-                return;
-            Status = Status.Archive();
-            Touch(nowUtc);
-
-            Raise(new ProjectArchivedEvent(Id, nowUtc));
-        }
-        public void Complete(DateTime nowUtc)
-        {
-            
-            if (ProjectStatus.Completed == Status)
-                return;
-            Status = Status.Complete();
-            Touch(nowUtc);
-            Raise(new ProjectCompletedEvent(Id, nowUtc));
-        }
-        private void AddMemberInternal(UserId userId,MemberRole role,DateTime nowUtc)
+        private void AddMemberInternal(UserId userId,MemberRole role,IClock clock)
         {
             if(role== MemberRole.Owner)
                 throw new Exception("Cannot add another Owner to the project");
@@ -114,22 +107,22 @@ namespace TaskManagement.Domain.Projects
                 throw new Exception("Project has reached the maximum number of members (13)");
 
 
-            _members.Add(Member.Create(userId, role, nowUtc));
+            _members.Add(Member.Create(userId, role, clock.UtcNow));
 
-            Touch(nowUtc);
-            Raise(new ProjectMemberAddedEvent(Id, userId, role, nowUtc));
+            Touch(clock);
+            Raise(new ProjectMemberAddedEvent(Id, userId, role, clock.UtcNow));
         }
 
-        public void AddMember(UserId userId, DateTime nowUtc)=>
-                AddMemberInternal(userId, MemberRole.Viewer, nowUtc);
+        public void AddMember(UserId userId, IClock clock)=>
+                AddMemberInternal(userId, MemberRole.Viewer, clock);
 
-        public void AddAdmin(UserId userId, DateTime nowUtc)=>
-                AddMemberInternal(userId, MemberRole.Admin, nowUtc);
+        public void AddAdmin(UserId userId, IClock clock)=>
+                AddMemberInternal(userId, MemberRole.Admin, clock);
 
-        public void AddViewer(UserId userId, DateTime nowUtc) =>
-                AddMemberInternal(userId, MemberRole.Viewer, nowUtc);
+        public void AddViewer(UserId userId, IClock clock) =>
+                AddMemberInternal(userId, MemberRole.Viewer, clock);
 
-        public void RemoveMember(UserId userId,DateTime nowUtc
+        public void RemoveMember(UserId userId,IClock clock
             )
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
@@ -141,8 +134,8 @@ namespace TaskManagement.Domain.Projects
 
             if(!_members.Remove(member)) throw new Exception("Failed to remove member from the project");
 
-            Touch(nowUtc);
-            Raise(new ProjectMemberRemovedEvent(Id, userId, nowUtc));
+            Touch(clock);
+            Raise(new ProjectMemberRemovedEvent(Id, userId, clock.UtcNow));
         }
         
        
@@ -173,7 +166,7 @@ namespace TaskManagement.Domain.Projects
             member.ChangeRole(role);
             Raise(new ProjectMemberRoleChangedEvent(Id, userId, role, DateTime.UtcNow));
         }
-         public void AssignTaskToMember(UserId userId, TaskId taskId)
+         public void AssignTaskToMember(UserId userId, TaskId taskId,IClock clock)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
 
@@ -182,7 +175,7 @@ namespace TaskManagement.Domain.Projects
 
             member.AssignTask(taskId);
 
-            Raise(new ProjectMemberTaskAssignedEvent(Id, userId, taskId, DateTime.UtcNow));
+            Raise(new ProjectMemberTaskAssignedEvent(Id, userId, taskId, clock.UtcNow));
 
         }
         public void UnAssignTaskFromMember(UserId userId, TaskId taskId)
