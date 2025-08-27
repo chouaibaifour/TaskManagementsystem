@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaskManagement.Domain.Projects.ObjectValues;
 using TaskManagement.Domain.Users.ObjectValues;
 
-namespace TaskManagement.Domain.Projects.Events
+namespace TaskManagement.Domain.Projects.Events.ProjectMember
 {
     public sealed record ProjectMemberDesActivateEvent(
         ProjectId ProjectId, UserId UserId, DateTime OccurrdAtUtc);

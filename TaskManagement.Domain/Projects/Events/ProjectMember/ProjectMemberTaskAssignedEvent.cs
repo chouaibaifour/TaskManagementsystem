@@ -7,7 +7,7 @@ using TaskManagement.Domain.Projects.ObjectValues;
 using TaskManagement.Domain.Tasks.Value_Objects;
 using TaskManagement.Domain.Users.ObjectValues;
 
-namespace TaskManagement.Domain.Projects.Events
+namespace TaskManagement.Domain.Projects.Events.ProjectMember
 {
     public sealed record ProjectMemberTaskAssignedEvent
         (ProjectId ProjectId, UserId UserId, TaskId TaskId, DateTime nowUtc);
