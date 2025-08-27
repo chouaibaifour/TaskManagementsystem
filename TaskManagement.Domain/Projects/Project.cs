@@ -183,6 +183,13 @@ namespace TaskManagement.Domain.Projects
             Raise(new ProjectMemberTaskAssignedEvent(Id, userId, taskId, DateTime.UtcNow));
 
         }
+        public void UnAssignTaskFromMember(UserId userId, TaskId taskId)
+        {
+            var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
+            if (member == null)
+                throw new Exception("User is not an active member of the project");
+            member.UnAssignTask(taskId);
+        }
 
     }
 }
