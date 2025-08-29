@@ -29,29 +29,6 @@ namespace TaskManagement.Domain.Projects.ValueObjects
             Number = number;
         }
 
-        
-
-        public ProjectStatus ReActivte()
-        {
-            if (this == Archived && this != Completed)
-                return Active;
-            return this;
-        }
-
-        public ProjectStatus Archive()
-        {
-            if (this!=Archived && this != Completed)
-                return Archived;
-            return this;
-        }
-
-        public ProjectStatus Complete()
-        {
-            if (this == Active && this != Archived)
-                return Completed;
-            return this;
-        }
-
         public static bool operator ==(ProjectStatus a, ProjectStatus b) =>
             (ReferenceEquals(a, b) || (a is not null && b is not null) && a?.Number == b?.Number);
 
@@ -65,7 +42,30 @@ namespace TaskManagement.Domain.Projects.ValueObjects
 
         internal bool CanTransitionTo(ProjectStatus newStatus)
         {
-            throw new NotImplementedException();
+            if(this == newStatus)
+                return false;
+
+            if (CanTransitionToArchived(newStatus) || 
+                CanTransitionToCompleted(newStatus) || 
+                CanTransitionToActive(newStatus))
+                return true;
+
+            return false;
+        }
+
+        private bool CanTransitionToActive(ProjectStatus newStatus)
+        {
+            return (this == Archived);
+        }
+
+        private bool CanTransitionToCompleted(ProjectStatus newStatus)
+        {
+            return (this == Active);
+        }
+
+        private bool CanTransitionToArchived(ProjectStatus newStatus)
+        {
+                return (this == Active);
         }
     }
 }

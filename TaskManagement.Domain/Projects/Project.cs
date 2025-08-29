@@ -93,7 +93,7 @@ namespace TaskManagement.Domain.Projects
             var oldStatus = Status;
             Status = newStatus;
             Touch(clock);
-            //Raise(new ProjectChangeStatusEvent());
+            Raise(new ProjectChangeStatusEvent(Id ,oldStatus,newStatus,clock.UtcNow));
         }
         private void AddMemberInternal(UserId userId,MemberRole role,IClock clock)
         {
