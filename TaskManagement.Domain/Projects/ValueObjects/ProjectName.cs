@@ -13,7 +13,7 @@ namespace TaskManagement.Domain.Projects.ValueObjects
         private const int MAX_LENGTH = 500;
         
         
-        private ProjectName(string value) : base(value)
+        private ProjectName(string value) : base(value, nameof(ProjectName))
         {
             EnsureRequired(value);
             EnsureMaxLength(value, MAX_LENGTH);

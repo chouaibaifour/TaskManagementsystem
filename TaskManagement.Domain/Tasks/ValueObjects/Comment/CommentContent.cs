@@ -11,7 +11,7 @@ namespace TaskManagement.Domain.Tasks.ValueObjects.Comment
     {
         private const int MAX_LENGTH = 500;
 
-        public CommentContent(string value) : base(value)
+        public CommentContent(string value) : base(value, nameof(CommentContent))
         {
             EnsureMaxLength(value, MAX_LENGTH);
             EnsureRequired(value);

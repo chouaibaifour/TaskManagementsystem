@@ -9,26 +9,28 @@ namespace TaskManagement.Domain.Common.Primitives.ValueObject
     public abstract class Content
     {
         private string Value;
-       
+        private readonly string _FieldName;
+
         public  string Display => Value;
 
-        protected Content(string value)
+        protected Content(string value, string fieldName)
         {
 
             Value = value!.Trim();
+            _FieldName = fieldName;
         }
 
 
         protected void EnsureMaxLength(string value ,int MaxLength)
         {
             if (value.Length > MaxLength)
-                throw new ArgumentException($"Content cannot exceed {MaxLength} characters.");
+                throw new ArgumentException($"{_FieldName} cannot exceed {MaxLength} characters.");
         }
 
         protected void EnsureRequired(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException("Content cannot be null or whiteSpace.");
+                throw new ArgumentNullException($"{_FieldName} cannot be null or whiteSpace.");
         }
 
         public override string ToString() => Display;

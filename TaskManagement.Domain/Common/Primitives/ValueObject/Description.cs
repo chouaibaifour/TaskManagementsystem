@@ -9,7 +9,7 @@ namespace TaskManagement.Domain.Common.Primitives.ValueObject
     {
         private const int MAX_LENGTH = 500;
 
-        private Description(string value) : base(value)
+        private Description(string value) : base(value,nameof(Description))
         {
             
             EnsureMaxLength(value, MAX_LENGTH);

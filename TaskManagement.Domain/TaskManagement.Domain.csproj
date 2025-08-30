@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Notifications\" />
+    <Folder Include="Notifications\Services\" />
+    <Folder Include="Notifications\Policies\" />
     <Folder Include="Projects\Enums\" />
     <Folder Include="Projects\Policies\" />
     <Folder Include="Tasks\Enums\" />

@@ -12,7 +12,7 @@ namespace TaskManagement.Domain.Tasks.ValueObjects
         
         private const int MAX_LENGTH = 100;
 
-        public Title(string value ) : base(value)
+        public Title(string value ) : base(value, nameof(Title))
         {
             EnsureRequired(value);
             EnsureMaxLength(value,MAX_LENGTH);
