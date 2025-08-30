@@ -1,5 +1,5 @@
 ﻿using TaskManagement.Domain.Users;
-using TaskManagement.Domain.Users.ObjectValues;
+using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Application.Users.interfaces
 {
