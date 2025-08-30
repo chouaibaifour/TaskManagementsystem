@@ -7,10 +7,10 @@ namespace TaskManagement.Application.Users.Abstractions
 {
     public interface IUserService
     {
-        Task<Result<UserDto>> RegisterAsync(UserRegisterDto dto, CancellationToken ct);
-        Task<Result<UserDto>> LoginAsync(UserLoginDto dto, CancellationToken ct);
-        Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto, CancellationToken ct);
-        Task<Result<UserDto>> GetUserByIdAsync(UserId UserId, CancellationToken ct);
-        Task<Result<List<UserDto>>> ListUsersAsync(CancellationToken ct);
+        Task<Result<UserDto>> RegisterAsync(UserRegisterDto dto);
+        Task<Result<UserDto>> LoginAsync(UserLoginDto dto);
+        Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto);
+        Task<Result<UserDto>> GetUserByIdAsync(UserId UserId);
+        Task<Result<List<UserDto>>> ListUsersAsync();
     }
 }

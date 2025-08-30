@@ -26,12 +26,12 @@ namespace TaskManagement.Application.Users.UserCase
 
         private async Task<Result<UserDto>> Register
             (UserRegisterDto dto, 
-            IPasswordPolicy _passwordPolicy,
-            CancellationToken ct)
+            IPasswordPolicy _passwordPolicy
+            )
         {
             var email = Email.Create(dto.Email);
 
-            if (await _repo.GetByEmailAsync(email, ct) is not null)
+            if (await _repo.GetByEmailAsync(email) is not null)
                 return Result<UserDto>.Failure(Errors.User.EmailDuplicated);
 
 
@@ -48,7 +48,7 @@ namespace TaskManagement.Application.Users.UserCase
                                                     _clock
                                                 );
 
-            await _repo.AddAsync(user, ct);
+            await _repo.AddAsync(user);
 
             return Result<UserDto>.Success(
                 new UserDto
@@ -62,23 +62,23 @@ namespace TaskManagement.Application.Users.UserCase
                 );
         }
 
-        public async Task<Result<UserDto>> RegisterAsync(UserRegisterDto cmd, CancellationToken ct)
+        public async Task<Result<UserDto>> RegisterAsync(UserRegisterDto dto)
         {
 
             IPasswordPolicy _passwordPolicy = new DefaultPasswordPolicy();
-            return await Register(cmd, _passwordPolicy, ct);
+            return await Register(dto, _passwordPolicy);
 
         }
 
-        public async Task<Result<UserDto>> LoginAsync(UserLoginDto dto, CancellationToken ct)
+        public async Task<Result<UserDto>> LoginAsync(UserLoginDto dto)
         {
-            return await Login(dto, ct);
+            return await Login(dto);
         }
 
-        private async Task<Result<UserDto>> Login(UserLoginDto dto, CancellationToken ct)
+        private async Task<Result<UserDto>> Login(UserLoginDto dto)
         {
             var email = Email.Create(dto.Email);
-            var user = await _repo.GetByEmailAsync(email, ct);
+            var user = await _repo.GetByEmailAsync(email);
             if (user is null)
                 return Result<UserDto>.Failure(Errors.User.EmailInvlid);
 
@@ -86,7 +86,7 @@ namespace TaskManagement.Application.Users.UserCase
                 return Result<UserDto>.Failure(Errors.User.UserWrongCredential);
 
             user.RecordLogin(_clock);
-            await _repo.UpdateAsync(user, ct);
+            await _repo.UpdateAsync(user);
             return Result<UserDto>.Success(new UserDto
             (
                  user.Id.Value,
@@ -98,16 +98,16 @@ namespace TaskManagement.Application.Users.UserCase
 
         }
 
-        private async Task<Result<UserDto>> ChangeRole(ChangeUserRoleDto dto, CancellationToken ct)
+        private async Task<Result<UserDto>> ChangeRole(ChangeUserRoleDto dto)
         {
             var userId = new UserId(dto.UserId);
-            var user = await _repo.GetByIdAsync(userId, ct);
+            var user = await _repo.GetByIdAsync(userId);
 
             if (user is null) return Result<UserDto>.Failure(Errors.User.NotFound);
 
             user.ChangeRole(dto.NewRole, dto.ChangedBy, _clock);
 
-            await _repo.UpdateAsync(user, ct);
+            await _repo.UpdateAsync(user);
 
 
 
@@ -121,14 +121,14 @@ namespace TaskManagement.Application.Users.UserCase
             
         }
 
-        public async Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto, CancellationToken ct)
+        public async Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto)
         {
-            return await ChangeRole(dto, ct);
+            return await ChangeRole(dto);
         }
 
-        private async Task<Result<List<UserDto>>> ListUsers(CancellationToken ct)
+        private async Task<Result<List<UserDto>>> ListUsers()
         {
-            var users = await _repo.ListAsync(ct);
+            var users = await _repo.ListAsync();
             var dtos = users.Select(u =>
                 new UserDto(u.Id.Value, u.Name.Display, u.Email.Value, u.Role.ToString())
             ).ToList();
@@ -137,15 +137,15 @@ namespace TaskManagement.Application.Users.UserCase
            
         }
 
-        public async Task<Result<List<UserDto>>> ListUsersAsync(CancellationToken ct)
+        public async Task<Result<List<UserDto>>> ListUsersAsync()
         {
-            return await ListUsers(ct);
+            return await ListUsers();
         }
 
-        private async Task<Result<UserDto>> GetUserById(UserId userId, CancellationToken ct)
+        private async Task<Result<UserDto>> GetUserById(UserId userId)
         {
             var userIdObj = new UserId(userId);
-            var user = await _repo.GetByIdAsync(userIdObj, ct);
+            var user = await _repo.GetByIdAsync(userIdObj);
             if (user is null)
                 return Result<UserDto>.Failure(Errors.User.NotFound);
             return Result<UserDto>.Success(new UserDto
@@ -157,9 +157,9 @@ namespace TaskManagement.Application.Users.UserCase
             ));
         }
 
-        public async Task<Result<UserDto>> GetUserByIdAsync(UserId userId, CancellationToken ct)
+        public async Task<Result<UserDto>> GetUserByIdAsync(UserId userId)
         {
-            return await GetUserById(userId, ct);
+            return await GetUserById(userId );
         }
     }
 }

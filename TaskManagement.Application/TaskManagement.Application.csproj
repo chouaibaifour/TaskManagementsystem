@@ -15,4 +15,10 @@
     <ProjectReference Include="..\TaskManagement.Domain\TaskManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Projects\Abstractions\" />
+    <Folder Include="Projects\Dtos\" />
+    <Folder Include="Projects\UseCase\" />
+  </ItemGroup>
+
 </Project>

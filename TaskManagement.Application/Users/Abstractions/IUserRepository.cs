@@ -6,12 +6,12 @@ namespace TaskManagement.Application.Users.interfaces
     public interface IUserRepository
     {
 
-        Task<User?> GetByIdAsync(UserId id, CancellationToken ct = default);
-        Task<User?> GetByEmailAsync(Email email, CancellationToken ct = default);
-        Task AddAsync(User user, CancellationToken ct = default);
-        Task UpdateAsync(User user, CancellationToken ct = default);
-        Task<IEnumerable<User>> ListAsync(CancellationToken ct = default);
-        Task <bool> DeleteAsync(UserId id, CancellationToken ct = default);
-        Task<bool> ExistsAsync(UserId id, CancellationToken ct = default);
+        Task<User?> GetByIdAsync(UserId id );
+        Task<User?> GetByEmailAsync(Email email );
+        Task AddAsync(User user );
+        Task UpdateAsync(User user );
+        Task<IEnumerable<User>> ListAsync();
+        Task <bool> DeleteAsync(UserId id );
+        Task<bool> ExistsAsync(UserId id );
     }
 }
