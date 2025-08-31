@@ -83,6 +83,38 @@ namespace TaskManagement.Domain.Common.Errors
                                                 "Project status is required.");
 
         }
-
+        public  static class Task
+        {
+            public static readonly DomainError TitleRequired =
+                                new DomainError("Task.Title.Required",
+                                                "Task title is required.");
+            public static readonly DomainError TitleTooLong =
+                                new DomainError("Task.Title.TooLong",
+                                                "Task title is too long.");
+            public static readonly DomainError DuplicateTitle =
+                                new DomainError("Task.Title.Duplicate",
+                                                "A task with the same title already exists in this project.");
+            public static readonly DomainError NotFound =
+                                new DomainError("Task.NotFound",
+                                                "Task not found.");
+            public static readonly DomainError InvalidStatusTransition =
+                                new DomainError("Task.Status.InvalidTransition",
+                                                "Task status transition is invalid.");
+            public static readonly DomainError DueDateInPast =
+                                new DomainError("Task.DueDate.InPast",
+                                                "Due date cannot be in the past.");
+            public static readonly DomainError UserNotAuthorized =
+                                new DomainError("Task.User.NotAuthorized",
+                                                "User is not authorized to access this task.");
+            public static readonly DomainError DescriptionTooLong =
+                                new DomainError("Task.Description.TooLong",
+                                                "Task description is too long.");
+            public static readonly DomainError DescriptionRequired =
+                                new DomainError("Task.Description.Required",
+                                                "Task description is Required.");
+            public static readonly DomainError DuplicatedTaskInProject =
+                                new DomainError("Task.Duplicate",
+                                                "A task with the same title already exists in this project.");
+        }
     }
 }

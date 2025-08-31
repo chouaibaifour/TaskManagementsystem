@@ -80,7 +80,7 @@ namespace TaskManagement.Application.Projects.UseCase
 
         public async Task<Result<bool>> DeleteProjectAsync(ProjectId projectId)
         {
-           return await _repo.DeleteProjectAsync(projectId) ?
+           return await _repo.DeleteAsync(projectId) ?
 
                 Result<bool>.Success(true)
                 :

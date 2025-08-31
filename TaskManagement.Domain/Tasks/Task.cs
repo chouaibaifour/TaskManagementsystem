@@ -155,24 +155,26 @@ namespace TaskManagement.Domain.Tasks
             Raise(new TaskAssignedEvent(Id, oldAssigneeId, newAssigneeId, clock.UtcNow));
         }
 
-        public void AddComment(CommentId commentId, UserId authorId, CommentContent content, IClock clock)
+        public Comment AddComment(CommentId commentId, UserId authorId, CommentContent content, IClock clock)
         {
             var comment = Comment.Create(commentId, authorId, content, clock.UtcNow);
             _Comments.Add(comment);
             Touch(clock);
             Raise(new CommentAddedEvent(Id, authorId, comment.CommentId, clock.UtcNow));
+            return comment;
         }
 
-        public void EditComment(CommentId commentId, CommentContent newContent, UserId editorId, IClock clock)
+        public Comment EditComment(CommentId commentId, CommentContent newContent, UserId editorId, IClock clock)
         {
             var comment = _Comments.FirstOrDefault(c => c.CommentId == commentId);
             if (comment == null)
                 throw new InvalidOperationException("Comment not found.");
             if (comment.AuthorId != editorId)
                 throw new InvalidOperationException("Only the author can edit this comment.");
-            comment.Update(newContent);
+            comment.Update(newContent,clock);
             Touch(clock);
             Raise(new CommentEditedEvent(Id,  commentId,editorId, clock.UtcNow));
+            return comment;
         }
 
         public void DeleteComment(CommentId commentId, UserId deleterId, IClock clock)
@@ -186,6 +188,14 @@ namespace TaskManagement.Domain.Tasks
             Touch(clock);
             Raise(new CommentDeletedEvent(Id, commentId, deleterId, clock.UtcNow));
         }
-         
+
+        public Comment GetComment(CommentId commentId)
+        {
+            var comment = _Comments.FirstOrDefault(c => c.CommentId == commentId);
+            if (comment == null)
+                throw new InvalidOperationException("Comment not found.");
+            return comment;
+        }
+
     }
 }

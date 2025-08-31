@@ -7,7 +7,7 @@ using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Projects.Dtos.Member
+namespace TaskManagement.Application.Spec.Dtos
 {
     public record struct AssignTaskToMemberDto(
         ProjectId ProjectId,

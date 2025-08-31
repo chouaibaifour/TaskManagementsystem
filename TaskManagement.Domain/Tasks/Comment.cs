@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 using TaskManagement.Domain.Users.ValueObjects;
 
@@ -49,16 +50,16 @@ namespace TaskManagement.Domain.Tasks
                 null
             );
          }
-        public void Update(CommentContent newContent)
+        public void Update(CommentContent newContent,IClock clock)
         {
             AgainstSameContent(newContent);
                
             Content = newContent;
-            UpdatedAtUtc = DateTime.UtcNow;
+            UpdatedAtUtc = clock.UtcNow;
 
         }
 
-        public void AgainstSameContent(CommentContent newContent)
+        private void AgainstSameContent(CommentContent newContent)
         {
             if (newContent == Content)
                 throw new Exception("New content is the same as the current content");

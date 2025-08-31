@@ -16,7 +16,7 @@ namespace TaskManagement.Application.Projects.Abstractions
         Task<Project?> GetByIdAsync(ProjectId  projectId);
         Task AddAsync(Project project);
         Task UpdateAsync(Project project);
-        Task<bool> DeleteProjectAsync(ProjectId  projectId);
+        Task<bool> DeleteAsync(ProjectId  projectId);
         Task<List<Project>> ListAllProjectsAsync();
         Task<List<Project>> ListProjectsByOwnerIdAsync(UserId ownerId);
         

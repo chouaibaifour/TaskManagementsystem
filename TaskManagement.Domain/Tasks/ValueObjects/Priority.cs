@@ -29,7 +29,15 @@ namespace TaskManagement.Domain.Tasks.ValueObjects
             Number = number;
         }
 
-        
+        public static Priority From(byte number) => number switch
+        {
+            1 => Low,
+            2 => Meduim,
+            3 => High,
+            _ => throw new ArgumentOutOfRangeException(nameof(number), "Priority number must be (ie.1..3)")
+        };
+
+
 
         public static bool operator ==(Priority a, Priority b) =>
             ReferenceEquals(a, b) ||
