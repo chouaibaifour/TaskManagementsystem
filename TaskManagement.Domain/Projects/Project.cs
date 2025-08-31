@@ -82,7 +82,7 @@ namespace TaskManagement.Domain.Projects
         
         public void Complete(IClock clock) => updateProjectStatus(ProjectStatus.Completed,clock);
         public void Archive(IClock clock) => updateProjectStatus(ProjectStatus.Archived, clock);
-        public void ReActivate(IClock clock) => updateProjectStatus(ProjectStatus.Completed,clock);
+        public void Restore(IClock clock) => updateProjectStatus(ProjectStatus.Active,clock);
         
         private void updateProjectStatus(ProjectStatus newStatus,IClock clock)
         {
@@ -110,7 +110,7 @@ namespace TaskManagement.Domain.Projects
             _members.Add(Member.Create(userId, role, clock.UtcNow));
 
             Touch(clock);
-            Raise(new ProjectMemberAddedEvent(Id, userId, role, clock.UtcNow));
+            Raise(new ProjectMemberAddedEvent(Id, userId, role, UpdateAtUtc!.Value));
         }
 
         public void AddMember(UserId userId, IClock clock)=>
@@ -125,7 +125,7 @@ namespace TaskManagement.Domain.Projects
         public void RemoveMember(UserId userId,IClock clock
             )
         {
-            var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
+            var member = _members.FirstOrDefault(m => m.UserId == userId );
             if (member == null)
                 throw new Exception("User is not an active member of the project");
 
@@ -135,11 +135,11 @@ namespace TaskManagement.Domain.Projects
             if(!_members.Remove(member)) throw new Exception("Failed to remove member from the project");
 
             Touch(clock);
-            Raise(new ProjectMemberRemovedEvent(Id, userId, clock.UtcNow));
+            Raise(new ProjectMemberRemovedEvent(Id, userId, UpdateAtUtc!.Value));
         }
         
        
-        public void DeactivateMember(UserId userId)
+        public void DeactivateMember(UserId userId,IClock clock)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
             if (member == null)
@@ -147,26 +147,32 @@ namespace TaskManagement.Domain.Projects
             if (member.Role == MemberRole.Owner)
                 throw new Exception("Cannot remove the Owner from the project");
             member.Deactivate();
+            Raise(new ProjectMemberDesActivateEvent(Id, userId, clock.UtcNow));
         }
-        public void ActivateMember(UserId userId)
+        public void ActivateMember(UserId userId,IClock clock)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && !m.IsActive);
             if (member == null)
                 throw new Exception("User is not a deactivated member of the project");
             member.Activate();
+            Raise(new ProjectMemberActivateEvent(Id, userId, clock.UtcNow));
         }
          
-        public void ChangeMemberRole(UserId userId, MemberRole role)
+        public void ChangeMemberRole(UserId userId, MemberRole role,IClock clock)
         {
-            var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
+            var member = _members.FirstOrDefault(m => m.UserId == userId );
             if (member == null)
                 throw new Exception("User is not an active member of the project");
             if (member.Role == MemberRole.Owner)
                 throw new Exception("Cannot change the role of the Owner");
             member.ChangeRole(role);
-            Raise(new ProjectMemberRoleChangedEvent(Id, userId, role, DateTime.UtcNow));
+            Raise(new ProjectMemberRoleChangedEvent(Id, userId, role, clock.UtcNow));
         }
-         public void AssignTaskToMember(UserId userId, TaskId taskId,IClock clock)
+        
+
+
+
+        public void AssignTaskToMember(UserId userId, TaskId taskId,IClock clock)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId && m.IsActive);
 

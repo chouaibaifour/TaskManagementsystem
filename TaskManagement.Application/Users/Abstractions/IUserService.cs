@@ -10,6 +10,7 @@ namespace TaskManagement.Application.Users.Abstractions
         Task<Result<UserDto>> RegisterAsync(UserRegisterDto dto);
         Task<Result<UserDto>> LoginAsync(UserLoginDto dto);
         Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto);
+        Task<Result<UserDto>> ChangePasswordAsync(ChangeUserPasswordDto dto);
         Task<Result<UserDto>> GetUserByIdAsync(UserId UserId);
         Task<Result<List<UserDto>>> ListUsersAsync();
     }

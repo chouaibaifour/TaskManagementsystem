@@ -32,7 +32,7 @@ namespace TaskManagement.Application.Users.UserCase
             var email = Email.Create(dto.Email);
 
             if (await _repo.GetByEmailAsync(email) is not null)
-                return Result<UserDto>.Failure(Errors.User.EmailDuplicated);
+                return Result<UserDto>.Failure(DomainErrors.User.EmailDuplicated);
 
 
 
@@ -80,10 +80,10 @@ namespace TaskManagement.Application.Users.UserCase
             var email = Email.Create(dto.Email);
             var user = await _repo.GetByEmailAsync(email);
             if (user is null)
-                return Result<UserDto>.Failure(Errors.User.EmailInvlid);
+                return Result<UserDto>.Failure(DomainErrors.User.EmailInvlid);
 
             if (!user.PasswordHash.Verify(dto.Password))
-                return Result<UserDto>.Failure(Errors.User.UserWrongCredential);
+                return Result<UserDto>.Failure(DomainErrors.User.UserWrongCredential);
 
             user.RecordLogin(_clock);
             await _repo.UpdateAsync(user);
@@ -103,7 +103,7 @@ namespace TaskManagement.Application.Users.UserCase
             var userId = new UserId(dto.UserId);
             var user = await _repo.GetByIdAsync(userId);
 
-            if (user is null) return Result<UserDto>.Failure(Errors.User.NotFound);
+            if (user is null) return Result<UserDto>.Failure(DomainErrors.User.NotFound);
 
             user.ChangeRole(dto.NewRole, dto.ChangedBy, _clock);
 
@@ -147,7 +147,7 @@ namespace TaskManagement.Application.Users.UserCase
             var userIdObj = new UserId(userId);
             var user = await _repo.GetByIdAsync(userIdObj);
             if (user is null)
-                return Result<UserDto>.Failure(Errors.User.NotFound);
+                return Result<UserDto>.Failure(DomainErrors.User.NotFound);
             return Result<UserDto>.Success(new UserDto
             (
                 user.Id.Value,
@@ -160,6 +160,31 @@ namespace TaskManagement.Application.Users.UserCase
         public async Task<Result<UserDto>> GetUserByIdAsync(UserId userId)
         {
             return await GetUserById(userId );
+        }
+
+        public async Task<Result<UserDto>> ChangePasswordAsync(ChangeUserPasswordDto dto)
+        {
+            IPasswordPolicy passwordPolicy = new DefaultPasswordPolicy();
+            return  await ChangePassword(dto , passwordPolicy);
+        }
+
+        public async Task<Result<UserDto>> ChangePassword(ChangeUserPasswordDto dto,IPasswordPolicy passwordPolicy)
+        {
+            var email = Email.Create(dto.Email);
+            var user = await _repo.GetByEmailAsync(email);
+            if (user is null)
+                return Result<UserDto>.Failure(DomainErrors.User.EmailInvlid);
+
+            if (!user.PasswordHash.Verify(dto.CurrentPassword))
+                return Result<UserDto>.Failure(DomainErrors.User.UserWrongCredential);
+            user.ChangePassword(dto.NewPassword, passwordPolicy);
+            return Result<UserDto>.Success(new UserDto
+            (
+                 user.Id.Value,
+                 user.Email.Value,
+                 user.Name.Display,
+                 user.Role.ToString()
+            ));
         }
     }
 }

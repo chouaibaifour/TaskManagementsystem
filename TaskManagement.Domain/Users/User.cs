@@ -5,7 +5,7 @@ using TaskManagement.Domain.Users.Enums;
 
 
 using TaskManagement.Domain.Users.Events;
-
+using TaskManagement.Domain.Users.Policies;
 using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Domain.Users
@@ -46,8 +46,8 @@ namespace TaskManagement.Domain.Users
             Email email,
             PasswordHash passwordHash,
             Role role,
-            IClock clock,
-            CancellationToken ct = default
+            IClock clock
+           
         )
         {
 
@@ -108,6 +108,14 @@ namespace TaskManagement.Domain.Users
         }
 
         public bool VerifyPassword(string candidate) => PasswordHash.Verify(candidate);
+
+
+        public void ChangePassword(string newPassword,IPasswordPolicy passwordPolicy)
+        {
+            if(!passwordPolicy.isSatisfiedBy(newPassword))
+                throw new ArgumentException("Password does not meet the policy requirements");
+            PasswordHash = PasswordHash.FromPlainText(newPassword, passwordPolicy);
+        }
 
     }
 }

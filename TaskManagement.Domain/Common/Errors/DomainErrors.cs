@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Domain.Common.Errors
 {
-    public static class Errors
+    public static class DomainErrors
     {
         public static class User
         {
@@ -64,7 +64,7 @@ namespace TaskManagement.Domain.Common.Errors
                                 new DomainError("Project.User.NotAuthorized", 
                                                 "User is not authorized to access this project.");
 
-            public static readonly DomainError ProjectAlreadyExists =
+            public static readonly DomainError ProjectAlreadyExistsWithThisName =
                                 new DomainError("Project.AlreadyExists",
                                                 "Project with the same name already exists.");
 
