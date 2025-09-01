@@ -61,7 +61,7 @@ namespace TaskManagement.Domain.Common.Primitives.ValueObject
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return 1;
         }
 
     }

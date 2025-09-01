@@ -30,13 +30,13 @@ namespace TaskManagement.Application.Users.UseCase
             IPasswordPolicy _passwordPolicy
             )
         {
-            var email = Email.Create(dto.Email);
+           
 
-            if (await _repo.GetByEmailAsync(email) is not null)
+            if (await _repo.GetByEmailAsync(dto.Email) is not null)
                 return Result<UserResponse>.Failure(DomainErrors.User.EmailDuplicated);
 
 
-
+            var email = Email.Create(dto.Email);
             var password = PasswordHash.FromPlainText(dto.Password, _passwordPolicy);
             var fullname = FullName.Create(dto.FirstName, dto.LastName);
 
@@ -51,16 +51,7 @@ namespace TaskManagement.Application.Users.UseCase
 
             await _repo.AddAsync(user);
 
-            return Result<UserResponse>.Success(
-                new UserResponse
-                (
-                     user.Id,
-                     user.Name.Display,
-                     user.Email.Value,
-                     user.Role.ToString()
-
-                )
-                );
+            return Result<UserResponse>.Success(user.ToResponse());
         }
 
         public async Task<Result<UserResponse>> RegisterAsync(UserRegisterRequest dto)
@@ -78,8 +69,8 @@ namespace TaskManagement.Application.Users.UseCase
 
         private async Task<Result<UserResponse>> Login(UserLoginResquest dto)
         {
-            var email = Email.Create(dto.Email);
-            var user = await _repo.GetByEmailAsync(email);
+           
+            var user = await _repo.GetByEmailAsync(dto.Email);
             if (user is null)
                 return Result<UserResponse>.Failure(DomainErrors.User.EmailInvlid);
 
@@ -88,14 +79,7 @@ namespace TaskManagement.Application.Users.UseCase
 
             user.RecordLogin(_clock);
             await _repo.UpdateAsync(user);
-            return Result<UserResponse>.Success(new UserResponse
-            (
-                 user.Id.Value,
-                 user.Email.Value,
-                 user.Name.Display,
-                 user.Role.ToString()
-
-            ));
+            return Result<UserResponse>.Success(user.ToResponse());
 
         }
 
@@ -112,13 +96,7 @@ namespace TaskManagement.Application.Users.UseCase
 
 
 
-            return Result<UserResponse>.Success(new UserResponse
-            (
-                user.Id.Value,
-                user.Name.Display,
-                user.Email.Value,
-                user.Role.ToString()
-            ));
+            return Result<UserResponse>.Success(user.ToResponse());
             
         }
 
@@ -130,11 +108,9 @@ namespace TaskManagement.Application.Users.UseCase
         private async Task<Result<List<UserResponse>>> ListUsers()
         {
             var users = await _repo.ListAsync();
-            var dtos = users.Select(u =>
-                new UserResponse(u.Id.Value, u.Name.Display, u.Email.Value, u.Role.ToString())
-            ).ToList();
+            
 
-            return Result<List<UserResponse>>.Success(dtos);
+            return Result<List<UserResponse>>.Success(users.Select(u =>u.ToResponse()).ToList());
            
         }
 
@@ -165,21 +141,25 @@ namespace TaskManagement.Application.Users.UseCase
 
         public async Task<Result<UserResponse>> ChangePassword(UserChangePasswordRequest dto,IPasswordPolicy passwordPolicy)
         {
-            var email = Email.Create(dto.Email);
-            var user = await _repo.GetByEmailAsync(email);
+            
+
+            var user = await _repo.GetByEmailAsync(dto.Email);
+
+
             if (user is null)
+
                 return Result<UserResponse>.Failure(DomainErrors.User.EmailInvlid);
 
+
             if (!user.PasswordHash.Verify(dto.CurrentPassword))
+
                 return Result<UserResponse>.Failure(DomainErrors.User.UserWrongCredential);
+
+
             user.ChangePassword(dto.NewPassword, passwordPolicy);
-            return Result<UserResponse>.Success(new UserResponse
-            (
-                 user.Id.Value,
-                 user.Email.Value,
-                 user.Name.Display,
-                 user.Role.ToString()
-            ));
+
+
+            return Result<UserResponse>.Success(user.ToResponse());
         }
     }
 }
