@@ -10,9 +10,9 @@ namespace TaskManagement.Application.Projects.Mapper
 {
      public static class ProjectMemberDto
     {
-        public static MemberDto ToDto(this Member projectMember)
+        public static MemberResponse ToDto(this Member projectMember)
         {
-            return new MemberDto(
+            return new MemberResponse(
                 projectMember.UserId,
                 projectMember.Role.Display,
                 projectMember.IsActive ? "Active" : "InActive"

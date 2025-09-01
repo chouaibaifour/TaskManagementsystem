@@ -7,15 +7,15 @@ using TaskManagement.Application.Projects.Dtos.Member;
 using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Projects.Dtos
+namespace TaskManagement.Application.Projects.Contracts
 {
-    public record struct ProjectDto(
+    public record struct ProjectResponse(
         ProjectId Id,
         string Name,
         string Description,
         UserId OwnerId,
         string Status,
-        List<MemberDto> Members
+        List<MemberResponse> Members
     );
 
 }

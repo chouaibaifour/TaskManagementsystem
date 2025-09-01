@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Tasks.Dtos.Comment
+namespace TaskManagement.Application.Tasks.Contracts.Comment
 {
-    public record struct CommentDto
+    public record struct CommentResponse
         (
             CommentId Id,
             string Content,

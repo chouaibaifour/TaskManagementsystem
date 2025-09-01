@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskManagement.Application.Tasks.Dtos.Comment;
+using TaskManagement.Application.Tasks.Contracts.Comment;
 using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Tasks.Events.NewFolder;
 using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Tasks.Dtos
+namespace TaskManagement.Application.Tasks.Contracts
 {
-    public record struct TaskDto
+    public record struct TaskResponse
         (
             TaskId Id,
             string Title,
@@ -22,7 +22,7 @@ namespace TaskManagement.Application.Tasks.Dtos
             UserId CreatedById,
             UserId AssignedToId,
             ProjectId ProjectId,
-            List<CommentDto> Comments
+            List<CommentResponse> Comments
             
         );
 }

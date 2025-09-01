@@ -9,11 +9,12 @@ namespace TaskManagement.Domain.Users.Policies
 {
     public sealed class DefaultPasswordPolicy:IPasswordPolicy
     {
-        public static readonly Regex Pattren = new(
-            "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+\u002D=]{8,}$",
+        public static readonly Regex Pattern = new(
+            @"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=]{8,}$",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public bool isSatisfiedBy(string Password)
-        => !string.IsNullOrWhiteSpace(Password)&&Pattren.IsMatch(Password);
+            => !string.IsNullOrWhiteSpace(Password) && Pattern.IsMatch(Password);
+
     }
 }

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Users.Dtos
+namespace TaskManagement.Application.Users.Contracts
 {
-    public record struct ChangeUserPasswordDto(
+    public record struct UserChangePasswordRequest(
         string Email,
         string CurrentPassword,
         string NewPassword);

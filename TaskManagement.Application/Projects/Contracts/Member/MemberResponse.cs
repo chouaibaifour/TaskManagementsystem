@@ -7,7 +7,7 @@ using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Application.Projects.Dtos.Member
 {
-    public record struct MemberDto(
+    public record struct MemberResponse(
         UserId UserId,
         string Role,
         string IsActive

@@ -8,9 +8,9 @@ using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Tasks.Dtos
+namespace TaskManagement.Application.Tasks.Contracts
 {
-    public record struct CreateTaskDto(
+    public record struct CreateTaskRequest(
             string title,
             string description,
             ProjectId projectId,

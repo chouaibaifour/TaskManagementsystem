@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Tasks.Abstractions;
-using TaskManagement.Application.Tasks.Dtos;
-using TaskManagement.Application.Tasks.Dtos.Comment;
+using TaskManagement.Application.Tasks.Contracts;
+using TaskManagement.Application.Tasks.Contracts.Comment;
 using TaskManagement.Application.Tasks.Mapper;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Services;
@@ -26,11 +26,11 @@ namespace TaskManagement.Application.Tasks.UserCase
             _clock = clock;
         }
 
-        public async Task<Result<TaskDto>> AddCommentAsync(CreateCommentDto dto)
+        public async Task<Result<TaskResponse>> AddCommentAsync(CreateCommentRequest dto)
         {
             var task = await _repo.GetByIdAsync(dto.taskId);
             if (task is null)
-                return Result<TaskDto>.Failure(DomainErrors.Task.NotFound);
+                return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
             task.AddComment(
                         CommentId.New(),
                         dto.userId, 
@@ -40,10 +40,10 @@ namespace TaskManagement.Application.Tasks.UserCase
 
             await _repo.UpdateAsync(task);
 
-            return Result<TaskDto>.Success(task.ToDto());
+            return Result<TaskResponse>.Success(task.ToDto());
         }
 
-        public async Task<Result<bool>> DeleteCommentAsync(DeleteCommentDto dto)
+        public async Task<Result<bool>> DeleteCommentAsync(DeleteCommentRequest dto)
         {
             var task = await _repo.GetByIdAsync(dto.TaskId);
             if (task is null)
@@ -56,27 +56,27 @@ namespace TaskManagement.Application.Tasks.UserCase
             return Result<bool>.Success(true);
         }
 
-        public async Task<Result<TaskDto>> EditCommentAsync(UpdateCommentDto dto)
+        public async Task<Result<TaskResponse>> EditCommentAsync(UpdateCommentRequest dto)
         {
 
             var task = await _repo.GetByIdAsync(dto.TaskId);
             if (task is null)
-                return Result<TaskDto>.Failure(DomainErrors.Task.NotFound);
+                return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
 
             task.EditComment(dto.CommentId,CommentContent.Create(dto.NewContent), dto.UserId,  _clock);
 
             await _repo.UpdateAsync(task);
 
-            return Result<TaskDto>.Success(task.ToDto());
+            return Result<TaskResponse>.Success(task.ToDto());
         }
 
-        public async Task<Result<IEnumerable<CommentDto>>> GetCommentsByTaskIdAsync(TaskId taskId)
+        public async Task<Result<IEnumerable<CommentResponse>>> GetCommentsByTaskIdAsync(TaskId taskId)
         {
             var task = await _repo.GetByIdAsync(taskId);
             if (task is null)
-                return Result<IEnumerable<CommentDto>>.Failure(DomainErrors.Task.NotFound);
-            var comments = task.Comments.Select(c => c.ToDto());
-            return Result<IEnumerable<CommentDto>>.Success(comments);
+                return Result<IEnumerable<CommentResponse>>.Failure(DomainErrors.Task.NotFound);
+            var comments = task.Comments.Select(c => c.ToResponse());
+            return Result<IEnumerable<CommentResponse>>.Success(comments);
 
         }
     }

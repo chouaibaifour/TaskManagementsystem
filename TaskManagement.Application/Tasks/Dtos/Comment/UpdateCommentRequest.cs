@@ -7,9 +7,9 @@ using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Tasks.Dtos.Comment
+namespace TaskManagement.Application.Tasks.Contracts.Comment
 {
-    public record struct UpdateCommentDto
+    public record struct UpdateCommentRequest
         (
             TaskId TaskId,
             CommentId CommentId,

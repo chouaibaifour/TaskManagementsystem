@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Projects.Abstractions;
+using TaskManagement.Application.Projects.Contracts;
 using TaskManagement.Application.Projects.Dtos;
 using TaskManagement.Application.Projects.Dtos.Member;
 using TaskManagement.Application.Projects.Mapper;
@@ -18,7 +19,7 @@ using static TaskManagement.Domain.Common.Errors.DomainErrors;
 
 namespace TaskManagement.Application.Projects.UseCase
 {
-    public class ProjectService : IProjectSerivce
+    public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _repo;
 
@@ -30,39 +31,39 @@ namespace TaskManagement.Application.Projects.UseCase
             _clock = clock;
         }
 
-        public async Task<Result<ProjectDto>> ArchiveProject(ProjectId projectId)
+        public async Task<Result<ProjectResponse>> ArchiveProject(ProjectId projectId)
         {
             var project = await _repo.GetByIdAsync(projectId);
             if (project == null)
-                return Result<ProjectDto>.Failure(DomainErrors.Project.NotFound);
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound);
 
             project.Archive(_clock);
 
             await _repo.UpdateAsync(project);
 
-            return Result<ProjectDto>.Success(project.ToDto());
+            return Result<ProjectResponse>.Success(project.ToDto());
 
         }
 
-        public async Task<Result<ProjectDto>> CompleteProject(ProjectId projectId)
+        public async Task<Result<ProjectResponse>> CompleteProject(ProjectId projectId)
         {
             var project = await _repo.GetByIdAsync(projectId);
             if (project == null)
-                return Result<ProjectDto>.Failure(DomainErrors.Project.NotFound);
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound);
 
             project.Archive(_clock);
 
             await _repo.UpdateAsync(project);
 
-            return Result<ProjectDto>.Success(project.ToDto());
+            return Result<ProjectResponse>.Success(project.ToDto());
         }
 
-        public async Task<Result<ProjectDto>> CreateProjectAsync(CreateProjectDto dto)
+        public async Task<Result<ProjectResponse>> CreateProjectAsync(CreateProjectRequest dto)
         {
             var projectName = ProjectName.Create(dto.Name);
 
             if (await _repo.IsProjectExistsByNameAsync(projectName))
-                return Result<ProjectDto>.Failure(DomainErrors.Project.ProjectAlreadyExistsWithThisName);
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.ProjectAlreadyExistsWithThisName);
 
             var description = Description.Create(dto.Description);
 
@@ -74,7 +75,7 @@ namespace TaskManagement.Application.Projects.UseCase
             );
 
             await _repo.AddAsync(project);
-            return Result<ProjectDto>.Success(project.ToDto());
+            return Result<ProjectResponse>.Success(project.ToDto());
 
         }
 
@@ -87,64 +88,64 @@ namespace TaskManagement.Application.Projects.UseCase
                 Result<bool>.Failure(DomainErrors.Project.NotFound);
         }
 
-        public async Task<Result<List<ProjectDto>>> GetAllProjectsAsync()
+        public async Task<Result<List<ProjectResponse>>> GetAllProjectsAsync()
         {
             var projects = await _repo.ListAllProjectsAsync();
 
             return (projects == null || projects.Count == 0) ?
-                Result<List<ProjectDto>>.Failure(DomainErrors.Project.NotFound)
+                Result<List<ProjectResponse>>.Failure(DomainErrors.Project.NotFound)
                 :
-                Result<List<ProjectDto>>.Success(projects.Select(p => p.ToDto()).ToList());
+                Result<List<ProjectResponse>>.Success(projects.Select(p => p.ToDto()).ToList());
         }
 
-        public async Task<Result<ProjectDto>> GetProjectByIdAsync(ProjectId projectId)
+        public async Task<Result<ProjectResponse>> GetProjectByIdAsync(ProjectId projectId)
         {
             var project = await _repo.GetByIdAsync(projectId);
 
                 return (project==null)?
-                    Result<ProjectDto>.Failure(DomainErrors.Project.NotFound)
+                    Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound)
                     :
-                    Result<ProjectDto>.Success(project.ToDto());
+                    Result<ProjectResponse>.Success(project.ToDto());
 
         }
 
-        public async Task<Result<List<MemberDto>>> GetProjectMembers(ProjectId projectId)
+        public async Task<Result<List<MemberResponse>>> GetProjectMembers(ProjectId projectId)
         {
             var project = await _repo.GetByIdAsync(projectId);
 
             if (project == null)
-                return Result<List<MemberDto>>.Failure(DomainErrors.Project.NotFound);
+                return Result<List<MemberResponse>>.Failure(DomainErrors.Project.NotFound);
 
             var members = project.Members.Select(m => m.ToDto()).ToList();
 
-            return Result<List<MemberDto>>.Success(members);
+            return Result<List<MemberResponse>>.Success(members);
         }
 
-        public async Task<Result<List<ProjectDto>>> GetProjectsByOwnerIdAsync(UserId ownerId)
+        public async Task<Result<List<ProjectResponse>>> GetProjectsByOwnerIdAsync(UserId ownerId)
         {
             var projects = await _repo.ListProjectsByOwnerIdAsync(ownerId);
 
-            return Result<List<ProjectDto>>.Success(projects.Select(p => p.ToDto()).ToList());
+            return Result<List<ProjectResponse>>.Success(projects.Select(p => p.ToDto()).ToList());
         }
 
-        public async Task<Result<ProjectDto>> RestoreProject(ProjectId projectId)
+        public async Task<Result<ProjectResponse>> RestoreProject(ProjectId projectId)
         {
             var project = await _repo.GetByIdAsync(projectId);
             if (project == null)
-                return Result<ProjectDto>.Failure(DomainErrors.Project.NotFound);
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound);
 
             project.Restore(_clock);
 
             await _repo.UpdateAsync(project);
 
-            return Result<ProjectDto>.Success(project.ToDto());
+            return Result<ProjectResponse>.Success(project.ToDto());
         }
 
-        public async Task<Result<ProjectDto>> UpdateProjectAsync(UpdateProjectDto dto)
+        public async Task<Result<ProjectResponse>> UpdateProjectAsync(UpdateProjectRequest dto)
         {
             var project = await _repo.GetByIdAsync(dto.Id);
             if (project == null)
-                return Result<ProjectDto>.Failure(DomainErrors.Project.NotFound);
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound);
 
             project.UpdateDetails(
                 ProjectName.Create(dto.Name),
@@ -154,7 +155,7 @@ namespace TaskManagement.Application.Projects.UseCase
 
             await _repo.UpdateAsync(project);
 
-            return Result<ProjectDto>.Success(project.ToDto());
+            return Result<ProjectResponse>.Success(project.ToDto());
         }
     }
 }

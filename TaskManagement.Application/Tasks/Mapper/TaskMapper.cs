@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Application.Tasks.Contracts;
 
 namespace TaskManagement.Application.Tasks.Mapper
 {
     public static class TaskMapper
     {
-        public static Dtos.TaskDto ToDto(this Domain.Tasks.Task task)
+        public static TaskResponse ToDto(this Domain.Tasks.Task task)
         {
-            return new Dtos.TaskDto(
+            return new TaskResponse(
                 task.Id,
                 task.Title.Display,
                 task.Description.Display,
@@ -20,7 +21,7 @@ namespace TaskManagement.Application.Tasks.Mapper
                 task.CreatedById,
                 task.AssignedToId,
                 task.ProjectId,
-                task.Comments.Select(c => c.ToDto()).ToList()
+                task.Comments.Select(c => c.ToResponse()).ToList()
                 );
         }
     }

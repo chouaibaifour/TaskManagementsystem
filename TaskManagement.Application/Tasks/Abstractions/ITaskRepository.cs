@@ -7,7 +7,7 @@ namespace TaskManagement.Application.Tasks.Abstractions
 {
     public interface ITaskRepository
     {
-       Task<Domain.Tasks.Task> IsProjectTaskExistByTitle(ProjectId projectId, string title);
+       Task<bool> IsProjectTaskExistByTitle(ProjectId projectId, Title title);
        Task AddAsync(Domain.Tasks.Task task);
         Task<Domain.Tasks.Task?> GetByIdAsync(TaskId taskId);
         Task UpdateAsync(Domain.Tasks.Task task);

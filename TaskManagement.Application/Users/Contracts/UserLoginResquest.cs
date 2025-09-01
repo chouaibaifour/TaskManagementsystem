@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagement.Application.Users.Dtos
+namespace TaskManagement.Application.Users.Contracts
 {
-    public record struct UserRegisterDto
-    (
-        string FirstName,
-        string LastName,
+    public record struct UserLoginResquest(
         string Email,
         string Password);
+    
     
 }

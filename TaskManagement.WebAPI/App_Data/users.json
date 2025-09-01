@@ -1,0 +1,49 @@
+[
+  {
+    "Name": null,
+    "Email": null,
+    "PasswordHash": null,
+    "Role": 0,
+    "CreatedAtUtc": "0001-01-01T00:00:00",
+    "NotificationSettings": null,
+    "LastLoginAtUtc": null,
+    "Id": {
+      "Value": "00000000-0000-0000-0000-000000000000"
+    },
+    "DomainEvents": []
+  },
+  {
+    "Name": {
+      "First": "Amira",
+      "Last": "Bensaid",
+      "Display": "Amira Bensaid"
+    },
+    "Email": {
+      "Value": "amira.bensaid@example.com"
+    },
+    "PasswordHash": {
+      "Value": "4GFIvX/BzOqjaiCrcYMs6g==.5Pqmpx/o88tUh25VsYq6nA0JyibcZ\u002Bs/Tgg\u002BUMOFiRE="
+    },
+    "Role": 0,
+    "CreatedAtUtc": "2025-09-01T11:07:29.6037137Z",
+    "NotificationSettings": {
+      "EmailEnabled": true,
+      "PushEnabled": true
+    },
+    "LastLoginAtUtc": null,
+    "Id": {
+      "Value": "2b716e28-4cb1-4abc-91b2-ee23dac9a1a8"
+    },
+    "DomainEvents": [
+      {
+        "UserId": {
+          "Value": "2b716e28-4cb1-4abc-91b2-ee23dac9a1a8"
+        },
+        "Email": "amira.bensaid@example.com",
+        "Name": "Amira Bensaid",
+        "Role": 0,
+        "OccuredAtUtc": "2025-09-01T11:07:29.6037137Z"
+      }
+    ]
+  }
+]

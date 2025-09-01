@@ -1,20 +1,19 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Application.Users.Commands.Login;
-using TaskManagement.Application.Users.Commands.Register;
-using TaskManagement.Application.Users.Queries.GetUserById;
-using TaskManagement.Application.Users.Queries.ListUsers;
-using TaskManagement.Application.Users.Commands.ChangeRole;
+using TaskManagement.Application.Users.Abstractions;
+using TaskManagement.Application.Users.Contracts;
+using TaskManagement.Domain.Users.ValueObjects;
+
 namespace TaskManagement.WebAPI.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IUserService _userService;
 
-        public UsersController(IMediator mediator)
+        public UsersController(IUserService userService)
         {
-            _mediator = mediator;
+            _userService = userService;
         }
 
         /// <summary>
@@ -22,12 +21,12 @@ namespace TaskManagement.WebAPI.Controllers
         /// </summary>
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken ct)
+        public async Task<IActionResult> Register([FromBody]UserRegisterRequest dto)
         {
             
-            var result = await _mediator.Send(command, ct);
+            var result = await _userService.RegisterAsync(dto);
             return result.IsSuccess
-                ? Ok(new { result.Value?.Id, result.Value?.Email })
+                ? Ok(result.Value )
                 : BadRequest(result.Error);
         }
 
@@ -36,9 +35,9 @@ namespace TaskManagement.WebAPI.Controllers
         /// </summary>
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginUserCommand command, CancellationToken ct)
+        public async Task<IActionResult> Login([FromBody]UserLoginResquest dto)
         {
-            var result = await _mediator.Send(command, ct);
+            var result = await _userService.LoginAsync(dto);
             return result.IsSuccess
                 ? Ok(new { Token = result.Value })
                 : Unauthorized(result.Error);
@@ -49,13 +48,13 @@ namespace TaskManagement.WebAPI.Controllers
         /// </summary>
         [HttpPatch("{id:guid}/role")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeUserRoleCommand command, CancellationToken ct)
+        public async Task<IActionResult> ChangeRole(UserId id,UserChangeRoleRequest dto)
         {
             // Ensure route id == body id
-            if (id != command.UserId)
+            if (id != dto.UserId)
                 return BadRequest("Mismatched user id");
 
-            var result = await _mediator.Send(command, ct);
+            var result = await _userService.ChangeRoleAsync(dto);
             return result.IsSuccess
                 ? NoContent()
                 : BadRequest(result.Error);
@@ -66,10 +65,10 @@ namespace TaskManagement.WebAPI.Controllers
         /// </summary>
         [HttpGet("{id:guid}")]
         [Authorize]
-        public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var query = new GetUserByIdQuery(id);
-            var result = await _mediator.Send(query, ct);
+
+            var result = await _userService.GetUserByIdAsync(id);
             return result.IsSuccess
                 ? Ok(result.Value)
                 : NotFound(result.Error);
@@ -80,9 +79,9 @@ namespace TaskManagement.WebAPI.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> List(CancellationToken ct)
+        public async Task<IActionResult> List()
         {
-            var result = await _mediator.Send(new ListUsersQuery(), ct);
+            var result = await _userService.ListUsersAsync();
             return Ok(result.Value);
         }
     }

@@ -7,9 +7,9 @@ using TaskManagement.Domain.Common.Primitives.ValueObject;
 using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Tasks.Dtos
+namespace TaskManagement.Application.Tasks.Contracts
 {
-    public record struct UpdateTaskDto
+    public record struct UpdateTaskRequest
     (
          TaskId TaskId,
        string newTitle,

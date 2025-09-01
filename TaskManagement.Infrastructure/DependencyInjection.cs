@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskManagement.Domain.Users.ObjectValues;
-using TaskManagement.Domain.Users.Repositories;
+using TaskManagement.Application.Projects.Abstractions;
+using TaskManagement.Application.Tasks.Abstractions;
+using TaskManagement.Application.Users.interfaces;
 using TaskManagement.Infrastructure.Data.Json.Repositories;
 
 namespace TaskManagement.Infrastructure
@@ -20,8 +21,14 @@ namespace TaskManagement.Infrastructure
             // JSON file persistence (for Users)
             var userFilePath = config["Storage:UsersFile"] ?? "users.json";
             services.AddSingleton<IUserRepository>(_ => new UserRepositoryJson(userFilePath));
+            // JSON file persistence (for Projects)
+            var projectFilePath = config["Storage:ProjectsFile"] ?? "projects.json";
+            services.AddSingleton<IProjectRepository>(_ => new ProjectRepositoryJson(projectFilePath));
 
-            
+            // JSON file persistence (for Tasks)
+            var taskFilePath = config["Storage:TasksFile"] ?? "tasks.json";
+            services.AddSingleton<ITaskRepository>(_ => new TaskRepositoryJson(taskFilePath));
+
 
             return services;
         }

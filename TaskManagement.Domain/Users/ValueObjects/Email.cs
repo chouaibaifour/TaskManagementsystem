@@ -10,7 +10,7 @@ namespace TaskManagement.Domain.Users.ValueObjects
     public sealed class Email
     {
         private static readonly Regex Pattren = new(
-            "^(?=.{5,254}$)([a-zA-Z0-9_\\'+\\-.]+)@([a-zA-Z0-9\\-.]+)\\\\.([a-zA-Z]{2,})$"
+            @"^(?=.{5,254}$)([a-zA-Z0-9_'+\-.]+)@([a-zA-Z0-9\-.]+)\.([a-zA-Z]{2,})$"
             , RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
        public string Value { get; }

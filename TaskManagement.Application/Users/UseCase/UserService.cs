@@ -2,8 +2,9 @@
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Users.Abstractions;
 
-using TaskManagement.Application.Users.Dtos;
+using TaskManagement.Application.Users.Contracts;
 using TaskManagement.Application.Users.interfaces;
+using TaskManagement.Application.Users.Mapper;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Users;
@@ -11,7 +12,7 @@ using TaskManagement.Domain.Users.Enums;
 using TaskManagement.Domain.Users.Policies;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Users.UserCase
+namespace TaskManagement.Application.Users.UseCase
 {
     public class UserService: IUserService
     {
@@ -24,15 +25,15 @@ namespace TaskManagement.Application.Users.UserCase
             _clock = clock;
         }
 
-        private async Task<Result<UserDto>> Register
-            (UserRegisterDto dto, 
+        private async Task<Result<UserResponse>> Register
+            (UserRegisterRequest dto, 
             IPasswordPolicy _passwordPolicy
             )
         {
             var email = Email.Create(dto.Email);
 
             if (await _repo.GetByEmailAsync(email) is not null)
-                return Result<UserDto>.Failure(DomainErrors.User.EmailDuplicated);
+                return Result<UserResponse>.Failure(DomainErrors.User.EmailDuplicated);
 
 
 
@@ -40,7 +41,7 @@ namespace TaskManagement.Application.Users.UserCase
             var fullname = FullName.Create(dto.FirstName, dto.LastName);
 
 
-            var user = await User.RegisterAsync(
+            var user =  User.RegisterAsync(
                                                     fullname, 
                                                     email,
                                                     password, 
@@ -50,8 +51,8 @@ namespace TaskManagement.Application.Users.UserCase
 
             await _repo.AddAsync(user);
 
-            return Result<UserDto>.Success(
-                new UserDto
+            return Result<UserResponse>.Success(
+                new UserResponse
                 (
                      user.Id,
                      user.Name.Display,
@@ -62,7 +63,7 @@ namespace TaskManagement.Application.Users.UserCase
                 );
         }
 
-        public async Task<Result<UserDto>> RegisterAsync(UserRegisterDto dto)
+        public async Task<Result<UserResponse>> RegisterAsync(UserRegisterRequest dto)
         {
 
             IPasswordPolicy _passwordPolicy = new DefaultPasswordPolicy();
@@ -70,24 +71,24 @@ namespace TaskManagement.Application.Users.UserCase
 
         }
 
-        public async Task<Result<UserDto>> LoginAsync(UserLoginDto dto)
+        public async Task<Result<UserResponse>> LoginAsync(UserLoginResquest dto)
         {
             return await Login(dto);
         }
 
-        private async Task<Result<UserDto>> Login(UserLoginDto dto)
+        private async Task<Result<UserResponse>> Login(UserLoginResquest dto)
         {
             var email = Email.Create(dto.Email);
             var user = await _repo.GetByEmailAsync(email);
             if (user is null)
-                return Result<UserDto>.Failure(DomainErrors.User.EmailInvlid);
+                return Result<UserResponse>.Failure(DomainErrors.User.EmailInvlid);
 
             if (!user.PasswordHash.Verify(dto.Password))
-                return Result<UserDto>.Failure(DomainErrors.User.UserWrongCredential);
+                return Result<UserResponse>.Failure(DomainErrors.User.UserWrongCredential);
 
             user.RecordLogin(_clock);
             await _repo.UpdateAsync(user);
-            return Result<UserDto>.Success(new UserDto
+            return Result<UserResponse>.Success(new UserResponse
             (
                  user.Id.Value,
                  user.Email.Value,
@@ -98,12 +99,12 @@ namespace TaskManagement.Application.Users.UserCase
 
         }
 
-        private async Task<Result<UserDto>> ChangeRole(ChangeUserRoleDto dto)
+        private async Task<Result<UserResponse>> ChangeRole(UserChangeRoleRequest dto)
         {
             var userId = new UserId(dto.UserId);
             var user = await _repo.GetByIdAsync(userId);
 
-            if (user is null) return Result<UserDto>.Failure(DomainErrors.User.NotFound);
+            if (user is null) return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
 
             user.ChangeRole(dto.NewRole, dto.ChangedBy, _clock);
 
@@ -111,7 +112,7 @@ namespace TaskManagement.Application.Users.UserCase
 
 
 
-            return Result<UserDto>.Success(new UserDto
+            return Result<UserResponse>.Success(new UserResponse
             (
                 user.Id.Value,
                 user.Name.Display,
@@ -121,64 +122,58 @@ namespace TaskManagement.Application.Users.UserCase
             
         }
 
-        public async Task<Result<UserDto>> ChangeRoleAsync(ChangeUserRoleDto dto)
+        public async Task<Result<UserResponse>> ChangeRoleAsync(UserChangeRoleRequest dto)
         {
             return await ChangeRole(dto);
         }
 
-        private async Task<Result<List<UserDto>>> ListUsers()
+        private async Task<Result<List<UserResponse>>> ListUsers()
         {
             var users = await _repo.ListAsync();
             var dtos = users.Select(u =>
-                new UserDto(u.Id.Value, u.Name.Display, u.Email.Value, u.Role.ToString())
+                new UserResponse(u.Id.Value, u.Name.Display, u.Email.Value, u.Role.ToString())
             ).ToList();
 
-            return Result<List<UserDto>>.Success(dtos);
+            return Result<List<UserResponse>>.Success(dtos);
            
         }
 
-        public async Task<Result<List<UserDto>>> ListUsersAsync()
+        public async Task<Result<List<UserResponse>>> ListUsersAsync()
         {
             return await ListUsers();
         }
 
-        private async Task<Result<UserDto>> GetUserById(UserId userId)
+        private async Task<Result<UserResponse>> GetUserById(Guid userId)
         {
             var userIdObj = new UserId(userId);
             var user = await _repo.GetByIdAsync(userIdObj);
             if (user is null)
-                return Result<UserDto>.Failure(DomainErrors.User.NotFound);
-            return Result<UserDto>.Success(new UserDto
-            (
-                user.Id.Value,
-                user.Name.Display,
-                user.Email.Value,
-                user.Role.ToString()
-            ));
+                return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
+            return Result<UserResponse>.Success(user.ToResponse());
         }
 
-        public async Task<Result<UserDto>> GetUserByIdAsync(UserId userId)
+        public async Task<Result<UserResponse>> GetUserByIdAsync(Guid userId)
         {
             return await GetUserById(userId );
         }
 
-        public async Task<Result<UserDto>> ChangePasswordAsync(ChangeUserPasswordDto dto)
+        public async Task<Result<UserResponse>> ChangePasswordAsync(UserChangePasswordRequest dto)
         {
             IPasswordPolicy passwordPolicy = new DefaultPasswordPolicy();
             return  await ChangePassword(dto , passwordPolicy);
         }
 
-        public async Task<Result<UserDto>> ChangePassword(ChangeUserPasswordDto dto,IPasswordPolicy passwordPolicy)
+        public async Task<Result<UserResponse>> ChangePassword(UserChangePasswordRequest dto,IPasswordPolicy passwordPolicy)
         {
             var email = Email.Create(dto.Email);
             var user = await _repo.GetByEmailAsync(email);
             if (user is null)
-                return Result<UserDto>.Failure(DomainErrors.User.EmailInvlid);
+                return Result<UserResponse>.Failure(DomainErrors.User.EmailInvlid);
 
             if (!user.PasswordHash.Verify(dto.CurrentPassword))
-                return Result<UserDto>.Failure(DomainErrors.User.UserWrongCredential);
+                return Result<UserResponse>.Failure(DomainErrors.User.UserWrongCredential);
             user.ChangePassword(dto.NewPassword, passwordPolicy);
-            return Result<UserDto>.Success(new UserDto
+            return Result<UserResponse>.Success(new UserResponse
             (
                  user.Id.Value,
                  user.Email.Value,

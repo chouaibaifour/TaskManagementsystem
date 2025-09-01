@@ -1,4 +1,6 @@
 ﻿
+using System.Data;
+using System.Xml.Linq;
 using TaskManagement.Domain.Common.Primitives;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Users.Enums;
@@ -40,7 +42,8 @@ namespace TaskManagement.Domain.Users
             NotificationSettings = notificationSettings;
         }
 
-        public static Task<User> RegisterAsync
+        
+        public static User RegisterAsync
         (
             FullName name,
             Email email,
@@ -70,7 +73,7 @@ namespace TaskManagement.Domain.Users
                 user.Role,
                 user.CreatedAtUtc
             ));
-            return Task.FromResult(user);
+            return user;
 
 
         }

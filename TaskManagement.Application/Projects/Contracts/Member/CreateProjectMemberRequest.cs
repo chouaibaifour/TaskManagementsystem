@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Projects.Dtos
+namespace TaskManagement.Application.Projects.Contracts.Member
 {
-    public record struct CreateProjectMemberDto(ProjectId ProjectId, UserId UserId,MemberRole MemberRole);
+    public record struct CreateProjectMemberRequest(ProjectId ProjectId, UserId UserId,MemberRole MemberRole);
 }

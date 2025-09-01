@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Application.Users.interfaces;
 using TaskManagement.Domain.Users;
-using TaskManagement.Domain.Users.ObjectValues;
-using TaskManagement.Domain.Users.Repositories;
+using TaskManagement.Domain.Users.ValueObjects;
+
 
 namespace TaskManagement.Infrastructure.Data.Json.Repositories
 {
@@ -20,14 +21,14 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             _Storage = new FileStorage(filePath);
         }
 
-        public async Task AddAsync(User user, CancellationToken ct = default)
+        public async Task AddAsync(User user)
         {
             var users = await _Storage.LoadAsync<User>();
             users.Add(user);
             await _Storage.SaveAsync(users);
         }
 
-        public async Task<User?> GetByEmailAsync(Email email, CancellationToken ct = default)
+        public async Task<User?> GetByEmailAsync(Email email)
         {
             var users = await _Storage.LoadAsync<User>();
 
@@ -35,19 +36,19 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
 
         }
 
-        public async Task<User?> GetByIdAsync(UserId id, CancellationToken ct = default)
+        public async Task<User?> GetByIdAsync(UserId id)
         {
             var users = await _Storage.LoadAsync<User>();
 
             return users.FirstOrDefault(u => u.Id==id);
         }
 
-        public async Task<IEnumerable<User>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<User>> ListAsync()
         {
             return await _Storage.LoadAsync<User>();
         }
 
-        public async Task UpdateAsync(User user, CancellationToken ct = default)
+        public async Task UpdateAsync(User user)
         {
             var users = await _Storage.LoadAsync<User>();
 
@@ -59,7 +60,7 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             await _Storage.SaveAsync(users);
         }
 
-        public async Task DeleteAsync(UserId id, CancellationToken ct = default)
+        public async Task<bool> DeleteAsync(UserId id)
         {
             var users = await _Storage.LoadAsync<User>();
             var user = users.FirstOrDefault(u => u.Id == id);
@@ -67,7 +68,17 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             {
                 users.Remove(user);
                 await _Storage.SaveAsync(users);
+                return true;
             }
+            return false;
+        }
+
+        public async Task<bool> ExistsAsync(UserId id)
+        {
+            var users = await _Storage.LoadAsync<User>();
+
+            return users.Any(u => u.Id == id);
+            
         }
     }
 }

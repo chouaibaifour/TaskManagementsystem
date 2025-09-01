@@ -19,7 +19,7 @@ namespace TaskManagement.Domain.Users.ValueObjects
 
         public static PasswordHash FromPlainText(string password, IPasswordPolicy policy)
         {
-            if (policy.isSatisfiedBy(password))
+            if (!policy.isSatisfiedBy(password))
                 throw new ArgumentException("Password Does meet policy requirements.");
 
             using var rng = RandomNumberGenerator.Create();
