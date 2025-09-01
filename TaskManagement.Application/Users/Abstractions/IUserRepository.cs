@@ -7,7 +7,7 @@ namespace TaskManagement.Application.Users.interfaces
     {
 
         Task<User?> GetByIdAsync(Guid id );
-        Task<User?> GetByEmailAsync(Email email );
+        Task<User?> GetByEmailAsync(string email );
         Task AddAsync(User user );
         Task UpdateAsync(User user );
         Task<IEnumerable<User>> ListAsync();

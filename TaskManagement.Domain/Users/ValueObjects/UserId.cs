@@ -17,5 +17,14 @@ namespace TaskManagement.Domain.Users.ValueObjects
 
         public static implicit operator UserId(Guid value) => new UserId(value);
 
+        public static bool operator  ==(UserId A, Guid B)
+        {
+            return (A == new UserId(B));
+        }
+
+        public static bool operator !=(UserId A, Guid B)
+        {
+            return !(A == B);
+        }
     }
 }

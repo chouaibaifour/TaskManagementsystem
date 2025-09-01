@@ -41,6 +41,17 @@ namespace TaskManagement.Domain.Users.ValueObjects
             return !(left == right);
         }
 
+        public static bool operator ==(Email left, string right)
+        {
+            
+            if (left is null || right is null) return false;
+            return left.Value.Equals(right, StringComparison.OrdinalIgnoreCase);
+        }
+        public static bool operator !=(Email left, string right)
+        {
+            return !(left == right);
+        }
+
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj))

@@ -28,7 +28,7 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             await _Storage.SaveAsync(users);
         }
 
-        public async Task<User?> GetByEmailAsync(Email email)
+        public async Task<User?> GetByEmailAsync(string email)
         {
             var users = await _Storage.LoadAsync<User>();
 
@@ -36,7 +36,7 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
 
         }
 
-        public async Task<User?> GetByIdAsync(UserId id)
+        public async Task<User?> GetByIdAsync(Guid id)
         {
             var users = await _Storage.LoadAsync<User>();
 
@@ -60,7 +60,7 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             await _Storage.SaveAsync(users);
         }
 
-        public async Task<bool> DeleteAsync(UserId id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var users = await _Storage.LoadAsync<User>();
             var user = users.FirstOrDefault(u => u.Id == id);
@@ -73,7 +73,7 @@ namespace TaskManagement.Infrastructure.Data.Json.Repositories
             return false;
         }
 
-        public async Task<bool> ExistsAsync(UserId id)
+        public async Task<bool> ExistsAsync(Guid id)
         {
             var users = await _Storage.LoadAsync<User>();
 
