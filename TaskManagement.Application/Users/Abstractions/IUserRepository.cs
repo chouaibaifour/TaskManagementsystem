@@ -1,7 +1,7 @@
 ﻿using TaskManagement.Domain.Users;
 using TaskManagement.Domain.Users.ValueObjects;
 
-namespace TaskManagement.Application.Users.interfaces
+namespace TaskManagement.Application.Users.Abstractions
 {
     public interface IUserRepository
     {

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 
 namespace TaskManagement.Infrastructure.Data.Json;
 
 public class FileStorage
 {
     private readonly string _filePath;
-
+    private readonly JsonSerializerOptions _options = new JsonSerializerOptions { WriteIndented = true };
 
     public FileStorage(string filePath)
     {
@@ -21,18 +16,19 @@ public class FileStorage
     private void InitializeFile()
     {
         if (!File.Exists(_filePath)) File.WriteAllText(_filePath, "[]");
+        
     }
 
     public async Task<List<T>> LoadAsync<T>()
     {
-        using var sr = File.OpenRead(_filePath);
+        await using var sr = File.OpenRead(_filePath);
         return await JsonSerializer.DeserializeAsync<List<T>>(sr) ?? new List<T>();
     }
 
     public async Task SaveAsync<T>(List<T> items)
     {
-        using var stream = File.Create(_filePath);
+        await using var stream = File.Create(_filePath);
         await JsonSerializer.SerializeAsync(stream, items,
-            new JsonSerializerOptions { WriteIndented = true });
+            _options);
     }
 }
