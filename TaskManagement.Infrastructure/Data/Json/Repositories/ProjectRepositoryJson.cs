@@ -6,9 +6,9 @@ using TaskManagement.Infrastructure.Data.Json.FileHandling;
 
 namespace TaskManagement.Infrastructure.Data.Json.Repositories;
 
-public class ProjectRepositoryJson(string filePath) : IProjectRepository
+public class ProjectRepositoryJson(ProjectFilePath projectFile) : IProjectRepository
 {
-    private readonly FileStorage _storage = new(filePath);
+    private readonly FileStorage _storage = new(projectFile.Path);
 
     public async Task AddAsync(Project project)
     {

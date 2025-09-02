@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskManagement.Domain.Common.Services;
+﻿using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 using TaskManagement.Domain.Users.ValueObjects;
 
@@ -15,7 +10,7 @@ namespace TaskManagement.Domain.Tasks
         public UserId AuthorId { get; private set; }
         public CommentContent Content { get; private set; }
         public DateTime CreatedAtUtc { get; private set; }
-        public DateTime? UpdatedAtUtc { get; private set; }
+        private DateTime? UpdatedAtUtc { get; set; }
 
         private Comment
         (
@@ -66,7 +61,7 @@ namespace TaskManagement.Domain.Tasks
         }
 
         public override string ToString()=>
-            $"{CommentId}-{AuthorId}-{Content.Display}-{CreatedAtUtc}-{UpdatedAtUtc}";
+            $"{CommentId}-{AuthorId}-{Content}-{CreatedAtUtc}-{UpdatedAtUtc}";
         
             
         

@@ -5,9 +5,9 @@ using TaskManagement.Infrastructure.Data.Json.FileHandling;
 
 namespace TaskManagement.Infrastructure.Data.Json.Repositories;
 
-public class TaskRepositoryJson(string filePath) : ITaskRepository
+public class TaskRepositoryJson(TaskFilePath TaskFile) : ITaskRepository
 {
-    private readonly FileStorage _storage = new(filePath);
+    private readonly FileStorage _storage = new(TaskFile.Path);
 
     public async Task AddAsync(Domain.Tasks.Task task)
     {

@@ -8,7 +8,7 @@ namespace TaskManagement.Domain.Common.Primitives
 {
     public abstract class Entity<TId>
     {
-        public TId Id { get; protected set; } = default!;
+        public TId Id { get; set; } = default!;
         private readonly List<object> _domainEvents = new();
         public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 

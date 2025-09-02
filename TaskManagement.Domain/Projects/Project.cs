@@ -37,7 +37,6 @@ namespace TaskManagement.Domain.Projects
             OwnerId = ownerId;
             Status = status;
             CreatedAtUtc = createdAtUtc;
-           
             _members = members;
         }
 
@@ -84,7 +83,7 @@ namespace TaskManagement.Domain.Projects
         {
             if (!Status.CanTransitionTo(newStatus))
                 throw new InvalidOperationException(
-                    $"can not transit Status from {Status.Display} to {newStatus.Display}."
+                    $"can not transit Status from {Status} to {newStatus}."
                     );
             var oldStatus = Status;
             Status = newStatus;

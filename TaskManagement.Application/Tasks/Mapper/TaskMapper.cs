@@ -13,8 +13,8 @@ namespace TaskManagement.Application.Tasks.Mapper
         {
             return new TaskResponse(
                 task.Id,
-                task.Title.Display,
-                task.Description.Display,
+                task.Title.ToString(),
+                task.Description.ToString(),
                 task.Status.Display,
                 task.Priority.Display,
                 task.DueDate,

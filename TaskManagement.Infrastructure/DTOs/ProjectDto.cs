@@ -10,11 +10,11 @@ public class ProjectDto(
     DateTime? updateAtUtc
     )
 {
-    public Guid Id { get; set; } = id;
-    public string Name { get; set; } = name;
-    public string Description { get; set; } = description;
-    public Guid OwnerId { get; set; } = ownerId;
-    public string Status { get; set; } = status;
-    public DateTime CreatedAtUtc { get; set; } = createdAtUtc;
-    public DateTime? UpdatedAtUtc { get; set; } = updateAtUtc;
+    public Guid Id { get; init; } = id;
+    public string Name { get; init; } = name;
+    public string Description { get; init; } = description;
+    public Guid OwnerId { get; init; } = ownerId;
+    public string Status { get; init; } = status;
+    public DateTime CreatedAtUtc { get; init; } = createdAtUtc;
+    public DateTime? UpdatedAtUtc { get; init; } = updateAtUtc;
 }

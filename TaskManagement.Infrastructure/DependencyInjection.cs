@@ -20,14 +20,16 @@ public static class DependencyInjection
         services.AddSingleton(new UserFilePath(config["Storage:UsersFile"] ?? "users.json"));
         services.AddSingleton<IUserRepository, UserRepositoryJson>();
         // JSON file persistence (for Projects)
-        var projectFilePath = config["Storage:ProjectsFile"] ?? "projects.json";
+        
+        services.AddSingleton(new ProjectFilePath(config["Storage:ProjectsFile"] ?? "projects.json"));
         services.AddSingleton<IProjectRepository,ProjectRepositoryJson>();
 
         // JSON file persistence (for Tasks)
-        var taskFilePath = config["Storage:TasksFile"] ?? "tasks.json";
+        
+        services.AddSingleton(new TaskFilePath(config["Storage:TasksFile"] ?? "tasks.json"));
         services.AddSingleton<ITaskRepository,TaskRepositoryJson>( );
 
-        services.AddAutoMapper(cfg => { cfg.AddProfile<UserProfile>(); });
+        services.AddAutoMapper(_ => { }, typeof(UserProfile),typeof(ProjectProfile)  /*, ...*/);
 
         return services;
     }

@@ -12,30 +12,21 @@ using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Application.Users.UseCase
 {
-    public class UserService: IUserService
+    public class UserService(IUserRepository userRepository, IClock clock) : IUserService
     {
-        private readonly IUserRepository _repo;
-        private readonly IClock _clock;
-
-        public UserService(IUserRepository userRepositry, IClock clock)
-        {
-            _repo = userRepositry;
-            _clock = clock;
-        }
-
         private async Task<Result<UserResponse>> Register
             (UserRegisterRequest dto, 
-            IPasswordPolicy _passwordPolicy
+            IPasswordPolicy passwordPolicy
             )
         {
            
 
-            if (await _repo.GetByEmailAsync(dto.Email) is not null)
+            if (await userRepository.GetByEmailAsync(dto.Email) is not null)
                 return Result<UserResponse>.Failure(DomainErrors.User.EmailDuplicated);
 
 
             var email = Email.Create(dto.Email);
-            var password = PasswordHash.FromPlainText(dto.Password, _passwordPolicy);
+            var password = PasswordHash.FromPlainText(dto.Password, passwordPolicy);
             var fullname = FullName.Create(dto.FirstName, dto.LastName);
 
 
@@ -44,10 +35,10 @@ namespace TaskManagement.Application.Users.UseCase
                                                     email,
                                                     password, 
                                                     Role.Default,
-                                                    _clock
+                                                    clock
                                                 );
 
-            await _repo.AddAsync(user);
+            await userRepository.AddAsync(user);
 
             return Result<UserResponse>.Success(user.ToResponse());
         }
@@ -55,8 +46,8 @@ namespace TaskManagement.Application.Users.UseCase
         public async Task<Result<UserResponse>> RegisterAsync(UserRegisterRequest dto)
         {
 
-            IPasswordPolicy _passwordPolicy = new DefaultPasswordPolicy();
-            return await Register(dto, _passwordPolicy);
+            IPasswordPolicy passwordPolicy = new DefaultPasswordPolicy();
+            return await Register(dto, passwordPolicy);
 
         }
 
@@ -68,15 +59,15 @@ namespace TaskManagement.Application.Users.UseCase
         private async Task<Result<UserResponse>> Login(UserLoginResquest dto)
         {
            
-            var user = await _repo.GetByEmailAsync(dto.Email);
+            var user = await userRepository.GetByEmailAsync(dto.Email);
             if (user is null)
                 return Result<UserResponse>.Failure(DomainErrors.User.EmailInvlid);
 
             if (!user.PasswordHash.Verify(dto.Password))
                 return Result<UserResponse>.Failure(DomainErrors.User.UserWrongCredential);
 
-            user.RecordLogin(_clock);
-            await _repo.UpdateAsync(user);
+            user.RecordLogin(clock);
+            await userRepository.UpdateAsync(user);
             return Result<UserResponse>.Success(user.ToResponse());
 
         }
@@ -84,13 +75,13 @@ namespace TaskManagement.Application.Users.UseCase
         private async Task<Result<UserResponse>> ChangeRole(UserChangeRoleRequest dto)
         {
             var userId = new UserId(dto.UserId);
-            var user = await _repo.GetByIdAsync(userId);
+            var user = await userRepository.GetByIdAsync(userId);
 
             if (user is null) return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
 
-            user.ChangeRole(dto.NewRole, dto.ChangedBy, _clock);
+            user.ChangeRole(dto.NewRole, dto.ChangedBy, clock);
 
-            await _repo.UpdateAsync(user);
+            await userRepository.UpdateAsync(user);
 
 
 
@@ -105,7 +96,7 @@ namespace TaskManagement.Application.Users.UseCase
 
         private async Task<Result<List<UserResponse>>> ListUsers()
         {
-            var users = await _repo.ListAsync();
+            var users = await userRepository.ListAsync();
             
 
             return Result<List<UserResponse>>.Success(users.Select(u =>u.ToResponse()).ToList());
@@ -120,7 +111,7 @@ namespace TaskManagement.Application.Users.UseCase
         private async Task<Result<UserResponse>> GetUserById(Guid userId)
         {
             var userIdObj = new UserId(userId);
-            var user = await _repo.GetByIdAsync(userIdObj);
+            var user = await userRepository.GetByIdAsync(userIdObj);
             if (user is null)
                 return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
             return Result<UserResponse>.Success(user.ToResponse());
@@ -137,11 +128,11 @@ namespace TaskManagement.Application.Users.UseCase
             return  await ChangePassword(dto , passwordPolicy);
         }
 
-        public async Task<Result<UserResponse>> ChangePassword(UserChangePasswordRequest dto,IPasswordPolicy passwordPolicy)
+        private async Task<Result<UserResponse>> ChangePassword(UserChangePasswordRequest dto,IPasswordPolicy passwordPolicy)
         {
             
 
-            var user = await _repo.GetByEmailAsync(dto.Email);
+            var user = await userRepository.GetByEmailAsync(dto.Email);
 
 
             if (user is null)

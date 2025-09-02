@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using TaskManagement.Domain.Users.Policies;
 namespace TaskManagement.Domain.Users.ValueObjects
 {
@@ -28,13 +23,15 @@ namespace TaskManagement.Domain.Users.ValueObjects
 
             var hash = Rfc2898DeriveBytes.Pbkdf2
                         (password, salt, Iterations, HashAlgorithmName.SHA256, KeySize);
-            var Payload = Convert.ToBase64String(salt)+ "."+Convert.ToBase64String(hash);
-            return new PasswordHash(Payload);
+            var payload = Convert.ToBase64String(salt)+ "."+Convert.ToBase64String(hash);
+            return new PasswordHash(payload);
         }
 
+        public static PasswordHash FromString(string password) => new(password);
+        
         public bool Verify(string password)
         {
-            var parts = password.Split('.');
+            var parts = this.Value.Split('.');
             if (parts.Length != 2) return false;
             var salt = Convert.FromBase64String(parts[0]);
             var expected = Convert.FromBase64String(parts[1]);

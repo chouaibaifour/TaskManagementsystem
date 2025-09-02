@@ -15,7 +15,7 @@ namespace TaskManagement.Application.Tasks.Mapper
         {
            return new CommentResponse(
                 comment.CommentId,
-                comment.Content.Display,
+                comment.Content.ToString(),
                 comment.AuthorId,
                 comment.CreatedAtUtc
                 );

@@ -1,7 +1,4 @@
-﻿
-using System.Data;
-using System.Xml.Linq;
-using TaskManagement.Domain.Common.Primitives;
+﻿using TaskManagement.Domain.Common.Primitives;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Users.Enums;
 
@@ -18,12 +15,9 @@ namespace TaskManagement.Domain.Users
         public Email Email { get; private set; }
         public PasswordHash PasswordHash { get; private set; }
         public Role Role { get; private set; }
-
         public DateTime CreatedAtUtc { get; private set; }
-      
-        public NotificationSettings NotificationSettings { get; private set; }
         public DateTime? LastLoginAtUtc { get; private set; }
-
+        public NotificationSettings NotificationSettings { get; private set; }
         private User(
             UserId id,
             FullName name,
@@ -31,6 +25,7 @@ namespace TaskManagement.Domain.Users
             PasswordHash passwordHash,
             Role role,
             DateTime createdAtUtc,
+            DateTime? lastLoginAtUtc,
             NotificationSettings notificationSettings)
         {
             Id = id;
@@ -39,9 +34,20 @@ namespace TaskManagement.Domain.Users
             PasswordHash = passwordHash;
             Role = role;
             CreatedAtUtc = createdAtUtc;
+            LastLoginAtUtc = lastLoginAtUtc;
             NotificationSettings = notificationSettings;
         }
 
+        public static User Rehydrate(
+            UserId id,
+            FullName name,
+            Email email,
+            PasswordHash passwordHash,
+            Role role,
+            DateTime createdAtUtc,
+            DateTime? lastLoginAtUtc,
+            NotificationSettings notificationSettings)
+            => new User(id, name, email, passwordHash, role, createdAtUtc, lastLoginAtUtc, notificationSettings);
         
         public static User RegisterAsync
         (
@@ -62,6 +68,7 @@ namespace TaskManagement.Domain.Users
                     passwordHash,
                     role,
                     clock.UtcNow,
+                    null,
                     NotificationSettings.Default
                 );
 
@@ -90,7 +97,7 @@ namespace TaskManagement.Domain.Users
             ));
         }
 
-        public void ChangeRole(Role newRole, string ChangedBy,IClock clock)
+        public void ChangeRole(Role newRole, string changedBy,IClock clock)
         {
             if (Role == newRole) return;
             Role = newRole;
@@ -100,12 +107,12 @@ namespace TaskManagement.Domain.Users
                     Id,
                     Role,
                     newRole,
-                    ChangedBy,
+                    changedBy,
                     clock.UtcNow
                 ));
         }
 
-        public void UpdateNotificationSettings(NotificationSettings settings)
+        public void UpdateNotificationSettings(NotificationSettings? settings)
         {
             NotificationSettings = settings ?? NotificationSettings;
         }
