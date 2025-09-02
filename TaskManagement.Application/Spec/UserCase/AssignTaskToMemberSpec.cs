@@ -11,7 +11,7 @@ using TaskManagement.Application.Spec.Contracts;
 using TaskManagement.Application.Tasks.Abstractions;
 using TaskManagement.Application.Tasks.Contracts;
 using TaskManagement.Application.Tasks.Mapper;
-using TaskManagement.Application.Users.interfaces;
+using TaskManagement.Application.Users.Abstractions;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Services;
 

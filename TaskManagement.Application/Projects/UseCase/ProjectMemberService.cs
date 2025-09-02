@@ -9,7 +9,7 @@ using TaskManagement.Application.Projects.Contracts;
 using TaskManagement.Application.Projects.Contracts.Member;
 using TaskManagement.Application.Projects.Dtos.Member;
 using TaskManagement.Application.Projects.Mapper;
-using TaskManagement.Application.Users.interfaces;
+using TaskManagement.Application.Users.Abstractions;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Projects.ValueObjects;

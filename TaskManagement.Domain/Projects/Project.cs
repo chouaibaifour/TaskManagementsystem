@@ -14,11 +14,11 @@ namespace TaskManagement.Domain.Projects
     {
         public ProjectName Name { get; private set; }
         public Description Description { get; private set; }
-        public UserId OwnerId { get; private set; }
-        public ProjectStatus Status { get; private set; } = ProjectStatus.Default;
-        public DateTime CreatedAtUtc { get; private set; }
-        public DateTime? UpdateAtUtc { get; private set; }
-        private List<Member> _members  = new List<Member>(13);
+        public UserId OwnerId { get;  }
+        public ProjectStatus Status { get; private set; }
+        private DateTime CreatedAtUtc { get; set; }
+        private DateTime? UpdateAtUtc { get; set; }
+        private readonly List<Member> _members;
 
         public IReadOnlyCollection<Member> Members => _members.AsReadOnly();
 
@@ -49,7 +49,7 @@ namespace TaskManagement.Domain.Projects
             IClock clock)
         {
 
-            var nowUtc = clock.UtcNow;
+            
 
             var project= new Project(
                 ProjectId.New(),
@@ -57,14 +57,10 @@ namespace TaskManagement.Domain.Projects
                 description,
                 ownerId,
                 ProjectStatus.Default,
-                nowUtc,
-                
-                new List<Member>
-                {
-                    Member.Create(ownerId,MemberRole.Owner,nowUtc)
-                });
+                clock.UtcNow,
+                [Member.Create(ownerId, MemberRole.Owner, clock.UtcNow)]);
 
-            project.Raise(new ProjectCreatedEvent(project.Id, project.OwnerId, nowUtc));
+            project.Raise(new ProjectCreatedEvent(project.Id, project.OwnerId, project.CreatedAtUtc));
 
             return project;
         }
@@ -80,11 +76,11 @@ namespace TaskManagement.Domain.Projects
         }
 
         
-        public void Complete(IClock clock) => updateProjectStatus(ProjectStatus.Completed,clock);
-        public void Archive(IClock clock) => updateProjectStatus(ProjectStatus.Archived, clock);
-        public void Restore(IClock clock) => updateProjectStatus(ProjectStatus.Active,clock);
+        public void Complete(IClock clock) => UpdateProjectStatus(ProjectStatus.Completed,clock);
+        public void Archive(IClock clock) => UpdateProjectStatus(ProjectStatus.Archived, clock);
+        public void Restore(IClock clock) => UpdateProjectStatus(ProjectStatus.Active,clock);
         
-        private void updateProjectStatus(ProjectStatus newStatus,IClock clock)
+        private void UpdateProjectStatus(ProjectStatus newStatus,IClock clock)
         {
             if (!Status.CanTransitionTo(newStatus))
                 throw new InvalidOperationException(
