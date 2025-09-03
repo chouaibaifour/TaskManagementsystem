@@ -1,8 +1,5 @@
 ﻿using TaskManagement.Domain.Common.Primitives;
 using TaskManagement.Domain.Common.Services;
-using TaskManagement.Domain.Users.Enums;
-
-
 using TaskManagement.Domain.Users.Events;
 using TaskManagement.Domain.Users.Policies;
 using TaskManagement.Domain.Users.ValueObjects;
@@ -14,7 +11,7 @@ namespace TaskManagement.Domain.Users
         public FullName Name { get; private set; }
         public Email Email { get; private set; }
         public PasswordHash PasswordHash { get; private set; }
-        public Role Role { get; private set; }
+        public UserRole UserRole { get; private set; }
         public DateTime CreatedAtUtc { get; private set; }
         public DateTime? LastLoginAtUtc { get; private set; }
         public NotificationSettings NotificationSettings { get; private set; }
@@ -23,7 +20,7 @@ namespace TaskManagement.Domain.Users
             FullName name,
             Email email,
             PasswordHash passwordHash,
-            Role role,
+            UserRole userRole,
             DateTime createdAtUtc,
             DateTime? lastLoginAtUtc,
             NotificationSettings notificationSettings)
@@ -32,7 +29,7 @@ namespace TaskManagement.Domain.Users
             Name = name;
             Email = email;
             PasswordHash = passwordHash;
-            Role = role;
+            UserRole = userRole;
             CreatedAtUtc = createdAtUtc;
             LastLoginAtUtc = lastLoginAtUtc;
             NotificationSettings = notificationSettings;
@@ -43,18 +40,18 @@ namespace TaskManagement.Domain.Users
             FullName name,
             Email email,
             PasswordHash passwordHash,
-            Role role,
+            UserRole userRole,
             DateTime createdAtUtc,
             DateTime? lastLoginAtUtc,
             NotificationSettings notificationSettings)
-            => new User(id, name, email, passwordHash, role, createdAtUtc, lastLoginAtUtc, notificationSettings);
+            => new User(id, name, email, passwordHash, userRole, createdAtUtc, lastLoginAtUtc, notificationSettings);
         
         public static User RegisterAsync
         (
             FullName name,
             Email email,
             PasswordHash passwordHash,
-            Role role,
+            UserRole userRole,
             IClock clock
            
         )
@@ -66,7 +63,7 @@ namespace TaskManagement.Domain.Users
                     name,
                     email,
                     passwordHash,
-                    role,
+                    userRole,
                     clock.UtcNow,
                     null,
                     NotificationSettings.Default
@@ -77,7 +74,7 @@ namespace TaskManagement.Domain.Users
                 user.Id,
                 user.Email.Value,
                 user.Name.Display,
-                user.Role,
+                user.UserRole,
                 user.CreatedAtUtc
             ));
             return user;
@@ -97,16 +94,16 @@ namespace TaskManagement.Domain.Users
             ));
         }
 
-        public void ChangeRole(Role newRole, string changedBy,IClock clock)
+        public void ChangeRole(UserRole newUserRole, string changedBy,IClock clock)
         {
-            if (Role == newRole) return;
-            Role = newRole;
+            if (UserRole == newUserRole) return;
+            UserRole = newUserRole;
             
             Raise(new UserRoleChangedEvent
                 (
                     Id,
-                    Role,
-                    newRole,
+                    UserRole,
+                    newUserRole,
                     changedBy,
                     clock.UtcNow
                 ));

@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 namespace TaskManagement.Domain.Projects.ValueObjects
 {
     public sealed class ProjectStatus
@@ -40,12 +42,9 @@ namespace TaskManagement.Domain.Projects.ValueObjects
             if(this == newStatus)
                 return false;
 
-            if (CanTransitionToArchived() || 
-                CanTransitionToCompleted() || 
-                CanTransitionToActive())
-                return true;
-
-            return false;
+            return CanTransitionToArchived() || 
+                   CanTransitionToCompleted() || 
+                   CanTransitionToActive();
         }
 
         private bool CanTransitionToActive()
@@ -61,6 +60,19 @@ namespace TaskManagement.Domain.Projects.ValueObjects
         private bool CanTransitionToArchived()
         {
                 return (this == Active);
+        }
+
+        public static ProjectStatus FromString(string value)
+        {
+            return value switch
+            {
+                "Active" => Active,
+                "Archived" => Archived,
+                "Completed" => Completed,
+                "Default" => Default,
+                _ => throw new ArgumentException($"Invalid value: {value}")
+            };
+
         }
     }
 }

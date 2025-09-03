@@ -16,8 +16,8 @@ namespace TaskManagement.Domain.Projects
         public Description Description { get; private set; }
         public UserId OwnerId { get;  }
         public ProjectStatus Status { get; private set; }
-        private DateTime CreatedAtUtc { get; set; }
-        private DateTime? UpdateAtUtc { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? UpdateAtUtc { get; set; }
         private readonly List<Member> _members;
 
         public IReadOnlyCollection<Member> Members => _members.AsReadOnly();
@@ -29,6 +29,7 @@ namespace TaskManagement.Domain.Projects
             UserId ownerId,
             ProjectStatus status,
             DateTime createdAtUtc,
+            DateTime? updateAtUtc,
             List<Member> members)
         {
             Id = id;
@@ -37,8 +38,20 @@ namespace TaskManagement.Domain.Projects
             OwnerId = ownerId;
             Status = status;
             CreatedAtUtc = createdAtUtc;
+            UpdateAtUtc = updateAtUtc;
             _members = members;
         }
+        
+        public static Project Rehydrate(
+            ProjectId id,
+            ProjectName name,
+            Description description,
+            UserId ownerId,
+            ProjectStatus status,
+            DateTime createdAtUtc,
+            DateTime? updateAtUtc,
+            List<Member> members)
+            => new(id, name, description, ownerId, status, createdAtUtc, updateAtUtc, members);
 
         public static Project Create
         (
@@ -56,7 +69,8 @@ namespace TaskManagement.Domain.Projects
                 description,
                 ownerId,
                 ProjectStatus.Default,
-                clock.UtcNow,
+                clock.UtcNow, 
+                null,
                 [Member.Create(ownerId, MemberRole.Owner, clock.UtcNow)]);
 
             project.Raise(new ProjectCreatedEvent(project.Id, project.OwnerId, project.CreatedAtUtc));
@@ -83,7 +97,7 @@ namespace TaskManagement.Domain.Projects
         {
             if (!Status.CanTransitionTo(newStatus))
                 throw new InvalidOperationException(
-                    $"can not transit Status from {Status} to {newStatus}."
+                    $"can not transit TaskStatus from {Status} to {newStatus}."
                     );
             var oldStatus = Status;
             Status = newStatus;
@@ -159,7 +173,7 @@ namespace TaskManagement.Domain.Projects
             if (member == null)
                 throw new Exception("User is not an active member of the project");
             if (member.Role == MemberRole.Owner)
-                throw new Exception("Cannot change the role of the Owner");
+                throw new Exception("Cannot change the userRole of the Owner");
             member.ChangeRole(role);
             Raise(new ProjectMemberRoleChangedEvent(Id, userId, role, clock.UtcNow));
         }

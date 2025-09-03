@@ -44,9 +44,9 @@ namespace TaskManagement.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Change user role (admin only)
+        /// Change user userRole (admin only)
         /// </summary>
-        [HttpPatch("{id:guid}/role")]
+        [HttpPatch("{id:guid}/userRole")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeRole(UserId id,UserChangeRoleRequest dto)
         {

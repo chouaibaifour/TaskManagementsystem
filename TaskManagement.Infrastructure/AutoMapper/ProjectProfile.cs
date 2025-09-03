@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using TaskManagement.Domain.Common.Primitives.ValueObject;
 using TaskManagement.Domain.Projects;
+using TaskManagement.Domain.Projects.ValueObjects;
+using TaskManagement.Domain.Users.ValueObjects;
 using TaskManagement.Infrastructure.DTOs;
 
 namespace TaskManagement.Infrastructure.AutoMapper;
@@ -7,17 +10,36 @@ namespace TaskManagement.Infrastructure.AutoMapper;
 public class ProjectProfile:Profile
 {
 
-    public ProjectProfile()
+    public ProjectProfile(IMapper mapper)
     {
         CreateMap<Project, ProjectDto>()
-            .ForMember(dst => dst.Name,
-                src => src.MapFrom(dto => dto.Name))
-            .ForMember(dst => dst.Description,
-                src => src.MapFrom(dto => dto.Description.ToString()))
-            .ForMember(dst => dst.OwnerId,
-                src => src.MapFrom(dto => dto.OwnerId.ToString()))
-            .ForMember(dst => dst.Status,
-                src => src.MapFrom(dto => dto.Status.ToString()));
+            .ConstructUsing(p => new ProjectDto(
+                p.Id.Value,
+                p.Name.ToString(),
+                p.Description.ToString(),
+                p.OwnerId.Value,
+                p.Status.ToString(),
+                p.CreatedAtUtc,
+                p.UpdateAtUtc,
+                p.Members.Select(m=> mapper.Map<Member,ProjectMemberDto>(m)).ToList()
+            ));
+
+        CreateMap<ProjectDto, Project>()
+            .ConstructUsing(dto =>  Project.Rehydrate(
+                new ProjectId(dto.Id),
+                ProjectName.Create(dto.Name),
+                Description.Create(dto.Description),
+                new UserId(dto.OwnerId),
+                ProjectStatus.FromString(dto.Status),
+                dto.CreatedAtUtc,
+                dto.UpdatedAtUtc,
+                dto.Members.Select(m
+                    =>mapper.Map<ProjectMemberDto,Member>(m)).ToList()
+              
+                
+                
+                
+            ));
 
     }
 }

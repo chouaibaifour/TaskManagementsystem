@@ -9,12 +9,12 @@ namespace TaskManagement.Domain.Projects
     public sealed class Member
     {
         public UserId UserId { get; private set; }
-        public MemberRole Role { get; private set; } = MemberRole.Viewer;
+        public MemberRole Role { get; private set; }
         public DateTime JoinedAtUtc { get; private set; }
         public bool IsActive { get; private set; }
         //TaskIds assigned to the member in the project
-        private List<TaskId> TaskIds = new();
-        public IReadOnlyCollection<TaskId> AssignedTaskIds => TaskIds.AsReadOnly();
+        private readonly List<TaskId> _taskIds;
+        public IReadOnlyCollection<TaskId> AssignedTaskIds => _taskIds.AsReadOnly();
 
 
         private Member
@@ -30,9 +30,19 @@ namespace TaskManagement.Domain.Projects
             Role = role;
             JoinedAtUtc = joinedAtUtc;
             IsActive = isActive;
-            TaskIds = taskIds;
+            _taskIds = taskIds;
         }
 
+        public static Member Rehydrate
+        (
+            UserId userId,
+            MemberRole role,
+            DateTime joinedAtUtc, 
+            bool isActive, 
+            List<TaskId> taskIds
+            )
+        =>
+            new(userId,role,joinedAtUtc,isActive,taskIds);
         public static Member Create
             (
                 UserId userId,
@@ -67,25 +77,25 @@ namespace TaskManagement.Domain.Projects
         public void ChangeRole(MemberRole newRole)
         {
             if(newRole==Role)
-                throw new Exception("Member already has the role");
+                throw new Exception("Member already has the userRole");
             if(newRole == MemberRole.Owner)
-                throw new Exception("Cannot assign Owner role to a member");
+                throw new Exception("Cannot assign Owner userRole to a member");
             Role = newRole;
 
         }
         public void AssignTask(TaskId taskId)
         {
-            if(TaskIds.Contains (taskId))
+            if(_taskIds.Contains (taskId))
                 throw new Exception("Task already assigned to the member");
-            TaskIds.Add(taskId);
+            _taskIds.Add(taskId);
         }
         public void UnAssignTask(TaskId taskId)
         {
-            if (!TaskIds.Contains(taskId))
+            if (!_taskIds.Contains(taskId))
                 throw new Exception("Task not assigned to the member");
-            TaskIds.Remove(taskId);
+            _taskIds.Remove(taskId);
         }
-        public int AssignedTaskCount() => TaskIds.Count;
+        public int AssignedTaskCount() => _taskIds.Count;
 
         public override string ToString() => 
             $"{UserId}-{Role}-{(IsActive ? "Active" : "Inactive")}";

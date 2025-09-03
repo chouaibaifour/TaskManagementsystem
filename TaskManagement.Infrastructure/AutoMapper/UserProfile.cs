@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using TaskManagement.Domain.Users;
-using TaskManagement.Domain.Users.Enums;
 using TaskManagement.Domain.Users.ValueObjects;
 using TaskManagement.Infrastructure.DTOs;
 
@@ -17,20 +16,21 @@ public class UserProfile : Profile
                 u.Name.Last,
                 u.Email.Value,
                 u.PasswordHash.Value,
-                u.Role.ToString(),
+                u.UserRole.ToEnum(),
                 u.CreatedAtUtc,
                 u.LastLoginAtUtc,
                 u.NotificationSettings.EmailEnabled,
                 u.NotificationSettings.PushEnabled
             ));
 
+        
         CreateMap<UserDto, User>()
             .ConstructUsing(dto =>  User.Rehydrate(
                 new UserId(dto.Id),
                 FullName.Create(dto.FirstName, dto.LastName),
                 Email.Create(dto.Email),
                 PasswordHash.FromString(dto.PasswordHash),
-                Enum.Parse<Role>(dto.Role),
+                UserRole.FromEnum(dto.Role),
                 dto.CreatedAtUtc,
                 dto.LastLoginAtUtc,
                 NotificationSettings.Create(dto.EmailEnabled, dto.PushEnabled)

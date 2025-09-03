@@ -28,13 +28,13 @@ namespace TaskManagement.Application.Tasks.UserCase
 
         public async Task<Result<TaskResponse>> AddCommentAsync(CreateCommentRequest dto)
         {
-            var task = await _repo.GetByIdAsync(dto.taskId);
+            var task = await _repo.GetByIdAsync(dto.TaskId);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
             task.AddComment(
                         CommentId.New(),
-                        dto.userId, 
-                        CommentContent.Create(dto.commentContent), 
+                        dto.UserId, 
+                        CommentContent.Create(dto.CommentContent), 
                         _clock
                      );
 

@@ -35,7 +35,7 @@ namespace TaskManagement.Domain.Common.Errors
                                 new DomainError("User.AlreadyExists", "User already exists.");
 
             public static readonly DomainError RoleIvalidTransition =
-                                new DomainError("User.Role.InvalidTransition", "Role transition is invalid.");
+                                new DomainError("User.UserRole.InvalidTransition", "UserRole transition is invalid.");
 
             public static readonly DomainError UserNotActive =
                                 new DomainError("User.NotActive", "User is not active.");
@@ -77,10 +77,10 @@ namespace TaskManagement.Domain.Common.Errors
 
             public static readonly DomainError InvalidStatusTransition =
                                 new DomainError("Project.ProjectStatus.InvalidTransition",
-                                                "Project status transition is invalid.");
+                                                "Project taskStatus transition is invalid.");
             public static readonly DomainError ProjectStatusRequired =
                                 new DomainError("Project.ProjectStatus.Required",
-                                                "Project status is required.");
+                                                "Project taskStatus is required.");
 
         }
         public  static class Task
@@ -98,8 +98,8 @@ namespace TaskManagement.Domain.Common.Errors
                                 new DomainError("Task.NotFound",
                                                 "Task not found.");
             public static readonly DomainError InvalidStatusTransition =
-                                new DomainError("Task.Status.InvalidTransition",
-                                                "Task status transition is invalid.");
+                                new DomainError("Task.TaskStatus.InvalidTransition",
+                                                "Task taskStatus transition is invalid.");
             public static readonly DomainError DueDateInPast =
                                 new DomainError("Task.DueDate.InPast",
                                                 "Due date cannot be in the past.");

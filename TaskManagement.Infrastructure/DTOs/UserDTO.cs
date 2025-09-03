@@ -5,7 +5,7 @@ public class UserDto(
     string lastName,
     string email,
     string passwordHash,
-    string role,
+    Enum role,
     DateTime createdAtUtc,
     DateTime? lastLoginAtUtc,
     bool emailEnabled,
@@ -16,7 +16,7 @@ public class UserDto(
     public string LastName { get; init; } = lastName;
     public string Email { get; init; } = email;
     public string PasswordHash { get; init; } = passwordHash;
-    public string Role { get; init; } = role;
+    public Enum Role { get; init; } = role;
     
     public DateTime CreatedAtUtc { get; init; } = createdAtUtc;
     

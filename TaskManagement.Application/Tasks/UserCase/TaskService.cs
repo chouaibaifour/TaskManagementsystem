@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Tasks.Abstractions;
 using TaskManagement.Application.Tasks.Contracts;
@@ -39,20 +35,20 @@ namespace TaskManagement.Application.Tasks.UserCase
 
         public async Task<Result<TaskResponse>> CreateTaskAsync(CreateTaskRequest dto)
         {
-            var title = Title.Create(dto.title);
+            var title = Title.Create(dto.Title);
             
 
-            if (await _taskRepository.IsProjectTaskExistByTitle(dto.projectId, title))
+            if (await _taskRepository.IsProjectTaskExistByTitle(dto.ProjectId, title))
                 return Result<TaskResponse>.Failure(Domain.Common.Errors.DomainErrors.Task.DuplicateTitle);
 
             var newTask = Domain.Tasks.Task.Create(
-                Title.Create(dto.title),
-                Description.Create(dto.description),
-                dto.projectId,
-                dto.createdById,
-                dto.assignedToId,
-                Priority.From(dto.priority),
-                dto.dueDate,
+                Title.Create(dto.Title),
+                Description.Create(dto.Description),
+                dto.ProjectId,
+                dto.CreatedById,
+                dto.AssignedToId,
+                TaskPriority.FromEnum(dto.Priority),
+                dto.DueDate,
                 _clock);
 
             await _taskRepository.AddAsync(newTask);

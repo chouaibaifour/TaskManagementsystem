@@ -7,7 +7,8 @@ public class ProjectDto(
     Guid ownerId,
     string status,
     DateTime createdAtUtc,
-    DateTime? updateAtUtc
+    DateTime? updateAtUtc,
+    List<ProjectMemberDto> members
     )
 {
     public Guid Id { get; init; } = id;
@@ -17,4 +18,5 @@ public class ProjectDto(
     public string Status { get; init; } = status;
     public DateTime CreatedAtUtc { get; init; } = createdAtUtc;
     public DateTime? UpdatedAtUtc { get; init; } = updateAtUtc;
+    public List<ProjectMemberDto> Members { get; init; } = members;
 }

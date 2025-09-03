@@ -9,11 +9,11 @@ namespace TaskManagement.Domain.Tasks.ValueObjects.Comment
 {
     public sealed  class CommentContent:Content
     {
-        private const int MAX_LENGTH = 500;
+        private const int MaxLength = 500;
 
-        public CommentContent(string value) : base(value, nameof(CommentContent))
+        private CommentContent(string value) : base(value, nameof(CommentContent))
         {
-            EnsureMaxLength(value, MAX_LENGTH);
+            EnsureMaxLength(value, MaxLength);
             EnsureRequired(value);
         }
 

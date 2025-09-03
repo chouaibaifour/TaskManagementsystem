@@ -10,7 +10,7 @@ namespace TaskManagement.Domain.Tasks
         public UserId AuthorId { get; private set; }
         public CommentContent Content { get; private set; }
         public DateTime CreatedAtUtc { get; private set; }
-        private DateTime? UpdatedAtUtc { get; set; }
+        public DateTime? UpdatedAtUtc { get; set; }
 
         private Comment
         (
@@ -62,9 +62,25 @@ namespace TaskManagement.Domain.Tasks
 
         public override string ToString()=>
             $"{CommentId}-{AuthorId}-{Content}-{CreatedAtUtc}-{UpdatedAtUtc}";
-        
-            
-        
 
+
+        public static Comment Rehydrate
+            (
+                CommentId commentId, 
+                UserId authorId,
+                CommentContent content, 
+                DateTime createdAtUtc,
+                DateTime? updatedAtUtc
+            )
+            =>
+                new
+                (
+                    commentId,
+                    authorId, 
+                    content, 
+                    createdAtUtc, 
+                    updatedAtUtc
+                );
+        
     }
 }

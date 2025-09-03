@@ -14,6 +14,7 @@
     <Folder Include="Tasks\Enums\" />
     <Folder Include="Tasks\Policies\" />
     <Folder Include="Tasks\Services\" />
+    <Folder Include="Users\Enums\" />
   </ItemGroup>
 
 </Project>

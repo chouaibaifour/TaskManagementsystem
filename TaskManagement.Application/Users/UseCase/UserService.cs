@@ -6,7 +6,6 @@ using TaskManagement.Application.Users.Mapper;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Users;
-using TaskManagement.Domain.Users.Enums;
 using TaskManagement.Domain.Users.Policies;
 using TaskManagement.Domain.Users.ValueObjects;
 
@@ -34,7 +33,7 @@ namespace TaskManagement.Application.Users.UseCase
                                                     fullname, 
                                                     email,
                                                     password, 
-                                                    Role.Default,
+                                                    UserRole.Default,
                                                     clock
                                                 );
 
@@ -79,7 +78,7 @@ namespace TaskManagement.Application.Users.UseCase
 
             if (user is null) return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
 
-            user.ChangeRole(dto.NewRole, dto.ChangedBy, clock);
+            user.ChangeRole(dto.NewUserRole, dto.ChangedBy, clock);
 
             await userRepository.UpdateAsync(user);
 

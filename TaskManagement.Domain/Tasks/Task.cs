@@ -9,6 +9,7 @@ using TaskManagement.Domain.Tasks.Events.NewFolder;
 using TaskManagement.Domain.Tasks.ValueObjects;
 using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 using TaskManagement.Domain.Users.ValueObjects;
+using TaskStatus = TaskManagement.Domain.Tasks.ValueObjects.TaskStatus;
 
 namespace TaskManagement.Domain.Tasks
 {
@@ -17,14 +18,14 @@ namespace TaskManagement.Domain.Tasks
 
         public Title Title { get; private set; }
         public Description Description { get; private set; }
-        public Status Status { get; private set; }
-        public Priority Priority { get; private set; }
+        public TaskStatus TaskStatus { get; private set; }
+        public TaskPriority TaskPriority { get; private set; }
         public DateTime DueDate { get; private set; }
         public UserId CreatedById { get; private set; }
         public UserId AssignedToId { get; private set; }
         public ProjectId ProjectId { get; private set; }
-        private List<Comment> _Comments = new List<Comment>();
-        public IReadOnlyCollection<Comment> Comments => _Comments.AsReadOnly();
+        private readonly List<Comment> _comments;
+        public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
         public DateTime CreatedAtUtc { get; private set; }
         public DateTime? UpdatedAtUtc { get; private set; }
 
@@ -34,10 +35,12 @@ namespace TaskManagement.Domain.Tasks
             Description description,
             ProjectId projectId,
             UserId createdById,
-            Priority priority,
+            UserId assignedToId,
+            TaskPriority taskPriority,
             DateTime dueDate,
-            Status status,
-            DateTime createdAtUtc)
+            TaskStatus taskStatus,
+            DateTime createdAtUtc,
+            List<Comment> comments)
         {
 
             if (dueDate < createdAtUtc)
@@ -48,11 +51,44 @@ namespace TaskManagement.Domain.Tasks
             Description = description;
             ProjectId = projectId;
             CreatedById = createdById;
-            Priority = priority;
-            Status = status;
+            AssignedToId = assignedToId;
+            TaskPriority = taskPriority;
+            TaskStatus = taskStatus;
             DueDate = dueDate;
             CreatedAtUtc = createdAtUtc;
+            _comments = comments;
         }
+        
+        private Task(
+            TaskId taskId,
+            Title title,
+            Description description,
+            ProjectId projectId,
+            UserId createdById,
+            
+            TaskPriority taskPriority,
+            DateTime dueDate,
+            TaskStatus taskStatus,
+            DateTime createdAtUtc,
+            List<Comment> comments)
+        {
+
+            if (dueDate < createdAtUtc)
+                throw new ArgumentException("Due date cannot be in the past.");
+
+            Id = taskId;
+            Title = title;
+            Description = description;
+            ProjectId = projectId;
+            CreatedById = createdById;
+            
+            TaskPriority = taskPriority;
+            TaskStatus = taskStatus;
+            DueDate = dueDate;
+            CreatedAtUtc = createdAtUtc;
+            _comments = comments;
+        }
+        
 
         public static Task Create(
             Title title,
@@ -60,7 +96,7 @@ namespace TaskManagement.Domain.Tasks
             ProjectId projectId,
             UserId createdById,
             UserId? assignedToId,
-            Priority priority,
+            TaskPriority taskPriority,
             DateTime dueDate,
             IClock clock) // Dependency for time
         {
@@ -74,10 +110,11 @@ namespace TaskManagement.Domain.Tasks
                     description,
                     projectId,
                     createdById,
-                    priority,
+                    taskPriority,
                     dueDate,
-                    Status.Default,
-                    clock.UtcNow
+                    TaskStatus.Default,
+                    clock.UtcNow,
+                    []
                 );
             task.Raise(new TaskCreatedEvent(task.Id, task.ProjectId, task.CreatedById));
 
@@ -104,18 +141,18 @@ namespace TaskManagement.Domain.Tasks
 
         }
 
-        private void UpdatePriority(Priority newPriority, IClock clock)
+        private void UpdatePriority(TaskPriority newTaskPriority, IClock clock)
         {
-            if (newPriority == Priority)
-                throw new InvalidOperationException("Priority is already set to this value.");
-            var oldPriority = Priority;
-            Priority = newPriority;
+            if (newTaskPriority == TaskPriority)
+                throw new InvalidOperationException("TaskPriority is already set to this value.");
+            var oldPriority = TaskPriority;
+            TaskPriority = newTaskPriority;
             Touch(clock);
-            Raise(new TaskPriorityChangedEvent(Id, oldPriority, newPriority,  clock.UtcNow));
+            Raise(new TaskPriorityChangedEvent(Id, oldPriority, newTaskPriority,  clock.UtcNow));
         }
-        public void LowPriority(IClock clock) => UpdatePriority(Priority.Low, clock);
-        public void MediumPriority(IClock clock) => UpdatePriority(Priority.Meduim, clock);
-        public void HighPriority(IClock clock) => UpdatePriority(Priority.High, clock);
+        public void LowPriority(IClock clock) => UpdatePriority(TaskPriority.Low, clock);
+        public void MediumPriority(IClock clock) => UpdatePriority(TaskPriority.Medium, clock);
+        public void HighPriority(IClock clock) => UpdatePriority(TaskPriority.High, clock);
 
         public void UpdateDueDate(DateTime newDueDate, IClock clock)
         {
@@ -129,21 +166,21 @@ namespace TaskManagement.Domain.Tasks
             Raise(new TaskDueDateChangedEvent(Id, oldDueDate, newDueDate, clock.UtcNow));
         }
 
-        private void UpdateStatus(Status newStatus, IClock clock)
+        private void UpdateStatus(TaskStatus newTaskStatus, IClock clock)
         {
-            if (!Status.CanTransitionTo(newStatus))
+            if (!TaskStatus.CanTransitionTo(newTaskStatus))
                 throw new InvalidOperationException(
-                    $"can not transit Status from {Status.Display} to {newStatus.Display}."
+                    $"can not transit TaskStatus from {TaskStatus.Display} to {newTaskStatus.Display}."
                     );
-            var oldStatus = Status;
-            Status = newStatus;
+            var oldStatus = TaskStatus;
+            TaskStatus = newTaskStatus;
             Touch(clock);
-            Raise(new TaskStatusChangedEvent(Id, oldStatus, newStatus));
+            Raise(new TaskStatusChangedEvent(Id, oldStatus, newTaskStatus));
         }
 
-        public void Start(IClock clock) => UpdateStatus(Status.InProgress, clock);
-        public void Complete(IClock clock) => UpdateStatus(Status.Completed, clock);
-        public void ReOpen(IClock clock) => UpdateStatus(Status.Todo, clock);
+        public void Start(IClock clock) => UpdateStatus(TaskStatus.InProgress, clock);
+        public void Complete(IClock clock) => UpdateStatus(TaskStatus.Completed, clock);
+        public void ReOpen(IClock clock) => UpdateStatus(TaskStatus.Todo, clock);
 
         public void AssignTo(UserId newAssigneeId, IClock clock)
         {
@@ -158,7 +195,7 @@ namespace TaskManagement.Domain.Tasks
         public Comment AddComment(CommentId commentId, UserId authorId, CommentContent content, IClock clock)
         {
             var comment = Comment.Create(commentId, authorId, content, clock.UtcNow);
-            _Comments.Add(comment);
+            _comments.Add(comment);
             Touch(clock);
             Raise(new CommentAddedEvent(Id, authorId, comment.CommentId, clock.UtcNow));
             return comment;
@@ -166,7 +203,7 @@ namespace TaskManagement.Domain.Tasks
 
         public Comment EditComment(CommentId commentId, CommentContent newContent, UserId editorId, IClock clock)
         {
-            var comment = _Comments.FirstOrDefault(c => c.CommentId == commentId);
+            var comment = _comments.FirstOrDefault(c => c.CommentId == commentId);
             if (comment == null)
                 throw new InvalidOperationException("Comment not found.");
             if (comment.AuthorId != editorId)
@@ -179,23 +216,56 @@ namespace TaskManagement.Domain.Tasks
 
         public void DeleteComment(CommentId commentId, UserId deleterId, IClock clock)
         {
-            var comment = _Comments.FirstOrDefault(c => c.CommentId == commentId);
+            var comment = _comments.FirstOrDefault(c => c.CommentId == commentId);
             if (comment == null)
                 throw new InvalidOperationException("Comment not found.");
             if (comment.AuthorId != deleterId)
                 throw new InvalidOperationException("Only the author can delete this comment.");
-            _Comments.Remove(comment);
+            _comments.Remove(comment);
             Touch(clock);
             Raise(new CommentDeletedEvent(Id, commentId, deleterId, clock.UtcNow));
         }
 
         public Comment GetComment(CommentId commentId)
         {
-            var comment = _Comments.FirstOrDefault(c => c.CommentId == commentId);
+            var comment = _comments.FirstOrDefault(c => c.CommentId == commentId);
             if (comment == null)
                 throw new InvalidOperationException("Comment not found.");
             return comment;
         }
+
+        public static Task Rehydrate
+        (
+            TaskId taskId,
+            Title title,
+            Description description,
+            TaskStatus status,
+            TaskPriority priority,
+            DateTime dueDate,
+            UserId createdById,
+            UserId assignedToId,
+            ProjectId projectId,
+            DateTime createdAtUtc,
+            DateTime? updateAtUtc,
+            List<Comment> comments
+
+        )
+            => new
+            ( 
+                taskId, 
+                title, 
+                description, 
+                projectId, 
+                createdById, 
+                assignedToId,
+                priority, 
+                dueDate, 
+                status, 
+                createdAtUtc,
+                comments
+
+
+            );
 
     }
 }

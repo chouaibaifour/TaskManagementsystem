@@ -4,9 +4,7 @@ namespace TaskManagement.Domain.Common.Primitives.ValueObject
 {
     public abstract class Content(string value, string fieldName)
     {
-        private readonly string _value = value.Trim();
-
-        private  string Display => _value;
+        private  string Display { get; } = value.Trim();
 
 
         protected void EnsureMaxLength(string value ,int maxLength)
@@ -28,7 +26,7 @@ namespace TaskManagement.Domain.Common.Primitives.ValueObject
             if (a.Equals( b))
                 return true;
                        
-            return a._value == b._value;
+            return a.Display == b.Display;
         }
         public static bool operator !=(Content a, Content b) => !(a == b);
 

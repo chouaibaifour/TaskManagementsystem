@@ -1,33 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace TaskManagement.Domain.Projects.ValueObjects           
 {
     public sealed class MemberRole
     {
-        public string Value { get; private set; }
-        public byte Number { get; private set; }
-        public string Display => Value;
-        public static MemberRole Owner => new("Owner", 1);
-        public static MemberRole Admin => new("Admin", 2);
-        public static MemberRole Member => new("Member", 3);
-        public static MemberRole Viewer => new("Viewer", 4);
+        
+
+        private enum EnMemberRole
+        {
+            Owner,
+            Member,
+            Admin,
+            Viewer
+        }
+        
+        private readonly EnMemberRole _value;
+        
+        public string Display => _value.ToString();
+        public static MemberRole Owner => new(EnMemberRole.Owner);
+        public static MemberRole Admin => new(EnMemberRole.Admin);
+        public static MemberRole Member => new(EnMemberRole.Member);
+        public static MemberRole Viewer => new(EnMemberRole.Viewer);
         public static MemberRole Default => Viewer;
 
-        private MemberRole(string value, byte number)
+        private MemberRole(EnMemberRole role)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("MemberRole value required");
-            if (number < 1 || number > 4)
-                throw new ArgumentException("MemberRole number must be (ie.1..4)");
-            Value = value.Trim();
-            Number = number;
+           _value = role;
+            
         }
         public static bool operator ==(MemberRole a, MemberRole b) =>
-            (ReferenceEquals(a, b) || (a is not null && b is not null) && a?.Number == b?.Number);
+            (ReferenceEquals(a, b) ||  a._value == b._value);
 
         public static bool operator !=(MemberRole a, MemberRole b) => !(a == b);
 
@@ -36,8 +37,14 @@ namespace TaskManagement.Domain.Projects.ValueObjects
         public override bool Equals(object? obj) =>
             obj is MemberRole role && this == role;
 
-        public override int GetHashCode() => HashCode.Combine(Number,Value);
+        public override int GetHashCode() => HashCode.Combine(_value,_value);
 
+        public static MemberRole FromEnum(Enum value)
+        {
+            Enum.TryParse<EnMemberRole>(value.ToString(), out var role  );
+            return new MemberRole(role);
+        }
+        public Enum ToEnum()=>_value;
        
     }
 }

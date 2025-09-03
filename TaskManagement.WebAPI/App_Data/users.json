@@ -1,14 +1,3 @@
 [
-  {
-    "Id": "7249aac3-e436-4b46-97a7-caf2c8f13129",
-    "FirstName": "Amira",
-    "LastName": "Bensaid",
-    "Email": "amira.bensaid@example.com",
-    "PasswordHash": "pZKiBWx5/AKfpxQ4IjVbXg==.spqqiuLmBbK4z5kuU5qK/p/in64UkHc8Nqrf/sVrWC8=",
-    "Role": "Member",
-    "CreatedAtUtc": "2025-09-03T15:12:40.5155661Z",
-    "LastLoginAtUtc": "2025-09-03T16:24:09.2715417Z",
-    "EmailEnabled": true,
-    "PushEnabled": true
-  }
+  
 ]
