@@ -1,4 +1,4 @@
-﻿using TaskManagement.Application.Projects.Dtos.Member;
+﻿using TaskManagement.Application.Projects.Contracts.Member;
 using TaskManagement.Domain.Projects;
 
 namespace TaskManagement.Application.Projects.Mapper

@@ -5,9 +5,9 @@ namespace TaskManagement.Application.Tasks.Contracts
     public record struct CreateTaskRequest(
             string Title,
             string Description,
-            ProjectId ProjectId,
-            UserId CreatedById,
-            UserId? AssignedToId,
+            Guid ProjectId,
+            Guid CreatedById,
+            Guid? AssignedToId,
             Enum Priority,
             DateTime DueDate);
     

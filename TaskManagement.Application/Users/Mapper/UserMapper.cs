@@ -17,7 +17,7 @@ namespace TaskManagement.Application.Users.Mapper
                 user.Id.Value,
                 user.Name.Display,
                 user.Email.Value,
-                user.UserRole.ToString()
+                user.UserRole.ToEnum()
             );
         }
     }

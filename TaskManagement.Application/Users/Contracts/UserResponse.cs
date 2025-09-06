@@ -9,10 +9,11 @@ namespace TaskManagement.Application.Users.Contracts
 {
     public  record struct UserResponse
     ( 
-        UserId Id,
+        Guid Id,
         string FullName,
         string Email,
-        string Role
+        Enum Role
+       
     );
        
     

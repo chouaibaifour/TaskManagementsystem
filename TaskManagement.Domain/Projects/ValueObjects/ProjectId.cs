@@ -12,6 +12,16 @@ namespace TaskManagement.Domain.Projects.ValueObjects
         public static implicit operator Guid(ProjectId ProjectId) => ProjectId.Value;
 
         public static implicit operator ProjectId(Guid Value) => new(Value);
+        
+        public static bool operator  ==(ProjectId A, Guid B)
+        {
+            return (A == new ProjectId(B));
+        }
+
+        public static bool operator !=(ProjectId A, Guid B)
+        {
+            return !(A == B);
+        }
 
     }
 }

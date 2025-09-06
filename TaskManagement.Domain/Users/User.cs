@@ -94,7 +94,7 @@ namespace TaskManagement.Domain.Users
             ));
         }
 
-        public void ChangeRole(UserRole newUserRole, string changedBy,IClock clock)
+        public void ChangeRole(UserRole newUserRole, UserId changedById,IClock clock)
         {
             if (UserRole == newUserRole) return;
             UserRole = newUserRole;
@@ -104,7 +104,7 @@ namespace TaskManagement.Domain.Users
                     Id,
                     UserRole,
                     newUserRole,
-                    changedBy,
+                    changedById,
                     clock.UtcNow
                 ));
         }

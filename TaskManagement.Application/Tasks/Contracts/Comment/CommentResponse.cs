@@ -10,9 +10,9 @@ namespace TaskManagement.Application.Tasks.Contracts.Comment
 {
     public record struct CommentResponse
         (
-            CommentId Id,
+            Guid Id,
             string Content,
-            UserId CreatedById,
+            Guid CreatedById,
             DateTime CreatedAt
         );
     

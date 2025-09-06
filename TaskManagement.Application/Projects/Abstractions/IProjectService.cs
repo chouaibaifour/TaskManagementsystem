@@ -1,29 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Projects.Contracts;
-using TaskManagement.Application.Projects.Dtos;
-using TaskManagement.Application.Projects.Dtos.Member;
-using TaskManagement.Domain.Projects.ValueObjects;
-using TaskManagement.Domain.Users.ValueObjects;
+using TaskManagement.Application.Projects.Contracts.Member;
+
+
 
 namespace TaskManagement.Application.Projects.Abstractions
 {
     public interface IProjectService
     {
         Task<Result<ProjectResponse>> CreateProjectAsync(CreateProjectRequest dto);
-        Task<Result<ProjectResponse>> GetProjectByIdAsync(ProjectId projectId);
-        Task<Result<List<ProjectResponse>>> GetProjectsByOwnerIdAsync(UserId ownerId);
-        Task<Result<bool>> DeleteProjectAsync(ProjectId projectId);
+        Task<Result<ProjectResponse>> GetProjectByIdAsync(Guid projectId);
+        Task<Result<List<ProjectResponse>>> GetProjectsByOwnerIdAsync(Guid ownerId);
+        Task<Result<bool>> DeleteProjectAsync(Guid projectId);
         Task<Result<ProjectResponse>> UpdateProjectAsync(UpdateProjectRequest dto);
         Task<Result<List<ProjectResponse>>> GetAllProjectsAsync();
-        Task<Result<ProjectResponse>> ArchiveProject(ProjectId projectId);
-        Task<Result<ProjectResponse>> RestoreProject(ProjectId projectId);
-        Task<Result<ProjectResponse>> CompleteProject(ProjectId project);
-        Task<Result<List<MemberResponse>>> GetProjectMembers(ProjectId projectId);
+        Task<Result<ProjectResponse>> ArchiveProject(Guid projectId);
+        Task<Result<ProjectResponse>> RestoreProject(Guid projectId);
+        Task<Result<ProjectResponse>> CompleteProject(Guid project);
+        Task<Result<List<MemberResponse>>> GetProjectMembers(Guid projectId);
+        
+        Task<Result<ProjectResponse>> AddProjectMember(CreateProjectMemberRequest dto);
+        Task<Result<ProjectResponse>> RemoveProjectMember(Guid projectId, Guid userId);
+        Task<Result<ProjectResponse>> DeactivateProjectMember(Guid projectId, Guid userId);
+        Task<Result<ProjectResponse>> ActivateProjectMember(Guid projectId, Guid userId);
         
 
     }

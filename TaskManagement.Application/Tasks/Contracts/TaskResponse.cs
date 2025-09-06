@@ -13,15 +13,15 @@ namespace TaskManagement.Application.Tasks.Contracts
 {
     public record struct TaskResponse
         (
-            TaskId Id,
+            Guid Id,
             string Title,
             string Description,
-            string Status,
-            string Priority,
+            Enum Status,
+            Enum Priority,
             DateTime DueDate,
-            UserId CreatedById,
-            UserId AssignedToId,
-            ProjectId ProjectId,
+            Guid CreatedById,
+            Guid AssignedToId,
+            Guid ProjectId,
             List<CommentResponse> Comments
             
         );

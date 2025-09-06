@@ -6,8 +6,8 @@ namespace TaskManagement.Application.Tasks.Contracts.Comment
 {
     public record struct CreateCommentRequest   
     (
-        TaskId TaskId,
+        Guid TaskId,
         string CommentContent, 
-        UserId UserId
+        Guid UserId
     );
 }

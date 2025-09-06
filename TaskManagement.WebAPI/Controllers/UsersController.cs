@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Application.Users.Abstractions;
@@ -7,15 +7,8 @@ using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.WebAPI.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController(IUserService userService) : Controller
     {
-        private readonly IUserService _userService;
-
-        public UsersController(IUserService userService)
-        {
-            _userService = userService;
-        }
-
         /// <summary>
         /// Register a new user
         /// </summary>
@@ -24,7 +17,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> Register([FromBody]UserRegisterRequest dto)
         {
             
-            var result = await _userService.RegisterAsync(dto);
+            var result = await userService.RegisterAsync(dto);
             return result.IsSuccess
                 ? Ok(result.Value )
                 : BadRequest(result.Error);
@@ -37,7 +30,7 @@ namespace TaskManagement.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]UserLoginResquest dto)
         {
-            var result = await _userService.LoginAsync(dto);
+            var result = await userService.LoginAsync(dto);
             return result.IsSuccess
                 ? Ok(new { Token = result.Value })
                 : Unauthorized(result.Error);
@@ -54,7 +47,7 @@ namespace TaskManagement.WebAPI.Controllers
             if (id != dto.UserId)
                 return BadRequest("Mismatched user id");
 
-            var result = await _userService.ChangeRoleAsync(dto);
+            var result = await userService.ChangeRoleAsync(dto);
             return result.IsSuccess
                 ? NoContent()
                 : BadRequest(result.Error);
@@ -68,7 +61,7 @@ namespace TaskManagement.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
 
-            var result = await _userService.GetUserByIdAsync(id);
+            var result = await userService.GetUserByIdAsync(id);
             return result.IsSuccess
                 ? Ok(result.Value)
                 : NotFound(result.Error);
@@ -81,7 +74,7 @@ namespace TaskManagement.WebAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> List()
         {
-            var result = await _userService.ListUsersAsync();
+            var result = await userService.ListUsersAsync();
             return Ok(result.Value);
         }
     }

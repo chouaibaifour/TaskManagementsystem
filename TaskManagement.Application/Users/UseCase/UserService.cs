@@ -78,7 +78,7 @@ namespace TaskManagement.Application.Users.UseCase
 
             if (user is null) return Result<UserResponse>.Failure(DomainErrors.User.NotFound);
 
-            user.ChangeRole(dto.NewUserRole, dto.ChangedBy, clock);
+            user.ChangeRole(UserRole.FromEnum(dto.NewUserRole), dto.ChangedBy, clock);
 
             await userRepository.UpdateAsync(user);
 

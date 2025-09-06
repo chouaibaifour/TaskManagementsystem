@@ -2,6 +2,6 @@
 
 namespace TaskManagement.Application.Users.Contracts
 {
-    public record struct UserChangeRoleRequest(UserId UserId, UserRole NewUserRole, string ChangedBy);
+    public record struct UserChangeRoleRequest(Guid UserId, Enum NewUserRole, Guid ChangedBy);
     
 }

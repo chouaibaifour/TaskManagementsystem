@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using TaskManagement.Application.Projects.Contracts;
-using TaskManagement.Application.Projects.Dtos;
-using TaskManagement.Application.Projects.Dtos.Member;
+using TaskManagement.Application.Projects.Contracts.Member;
 using TaskManagement.Domain.Projects;
 
 namespace TaskManagement.Application.Projects.Mapper

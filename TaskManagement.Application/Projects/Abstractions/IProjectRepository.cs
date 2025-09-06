@@ -12,14 +12,14 @@ namespace TaskManagement.Application.Projects.Abstractions
 {
     public interface IProjectRepository
     {
-        Task<bool> IsProjectExistsByNameAsync(ProjectName name);
-        Task<bool> IsProjectExistsAsync(ProjectId  projectId);
-        Task<Project?> GetByIdAsync(ProjectId  projectId);
+        Task<bool> IsProjectExistsByNameAsync(string name);
+        Task<bool> IsProjectExistsAsync(Guid  projectId);
+        Task<Project?> GetByIdAsync(Guid  projectId);
         Task AddAsync(Project project);
         Task UpdateAsync(Project project);
-        Task<bool> DeleteAsync(ProjectId  projectId);
+        Task<bool> DeleteAsync(Guid  projectId);
         Task<List<Project>> ListAllProjectsAsync();
-        Task<List<Project>> ListProjectsByOwnerIdAsync(UserId ownerId);
+        Task<List<Project>> ListProjectsByOwnerIdAsync(Guid ownerId);
         
     }
 

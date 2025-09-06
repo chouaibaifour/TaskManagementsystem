@@ -14,10 +14,7 @@ namespace TaskManagement.Application.Tasks.Abstractions
 {
     public interface ICommentService
     {
-        Task<Result<TaskResponse>> AddCommentAsync(CreateCommentRequest dto);
-        Task<Result<IEnumerable<CommentResponse>>> GetCommentsByTaskIdAsync(TaskId taskId);
-        Task<Result<bool>> DeleteCommentAsync(DeleteCommentRequest dto);
-        Task<Result<TaskResponse>> EditCommentAsync(UpdateCommentRequest dto);
+        
         
     }
 }

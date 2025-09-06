@@ -8,5 +8,5 @@ using TaskManagement.Domain.Users.ValueObjects;
 
 namespace TaskManagement.Application.Projects.Contracts.Member
 {
-    public record struct CreateProjectMemberRequest(ProjectId ProjectId, UserId UserId,MemberRole MemberRole);
+    public record struct CreateProjectMemberRequest(Guid ProjectId, Guid UserId,Enum MemberRole);
 }

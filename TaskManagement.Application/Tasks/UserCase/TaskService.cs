@@ -2,44 +2,37 @@
 using TaskManagement.Application.Common;
 using TaskManagement.Application.Tasks.Abstractions;
 using TaskManagement.Application.Tasks.Contracts;
+using TaskManagement.Application.Tasks.Contracts.Comment;
 using TaskManagement.Application.Tasks.Mapper;
 using TaskManagement.Domain.Common.Errors;
 using TaskManagement.Domain.Common.Primitives.ValueObject;
 using TaskManagement.Domain.Common.Services;
 using TaskManagement.Domain.Projects.ValueObjects;
 using TaskManagement.Domain.Tasks.ValueObjects;
+using TaskManagement.Domain.Tasks.ValueObjects.Comment;
 
 namespace TaskManagement.Application.Tasks.UserCase
 {
-    public class TaskService : ITaskService
+    public class TaskService(ITaskRepository taskRepository, IClock clock) : ITaskService
     {
-        private readonly ITaskRepository _taskRepository;
-        private readonly IClock _clock;
-
-        public TaskService(ITaskRepository taskRepository, IClock clock)
-        {
-            _taskRepository = taskRepository;
-            _clock = clock;
-        }
-
         public async Task<Result<TaskResponse>> CompleteTask(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.Complete(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.Complete(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
 
         }
 
         public async Task<Result<TaskResponse>> CreateTaskAsync(CreateTaskRequest dto)
         {
-            var title = Title.Create(dto.Title);
+            
             
 
-            if (await _taskRepository.IsProjectTaskExistByTitle(dto.ProjectId, title))
-                return Result<TaskResponse>.Failure(Domain.Common.Errors.DomainErrors.Task.DuplicateTitle);
+            if (await taskRepository.IsProjectTaskExistByTitle(dto.ProjectId, dto.Title))
+                return Result<TaskResponse>.Failure(DomainErrors.Task.DuplicateTitle);
 
             var newTask = Domain.Tasks.Task.Create(
                 Title.Create(dto.Title),
@@ -49,19 +42,19 @@ namespace TaskManagement.Application.Tasks.UserCase
                 dto.AssignedToId,
                 TaskPriority.FromEnum(dto.Priority),
                 dto.DueDate,
-                _clock);
+                clock);
 
-            await _taskRepository.AddAsync(newTask);
+            await taskRepository.AddAsync(newTask);
 
             return Result<TaskResponse>.Success(newTask.ToDto());
         }
 
         public async Task<Result<bool>> DeleteTaskAsync(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<bool>.Failure(DomainErrors.Task.NotFound);
-            var result = await _taskRepository.DeleteAsync(taskId);
+            var result = await taskRepository.DeleteAsync(taskId);
             return result
                 ? Result<bool>.Success(true)
                 : Result<bool>.Failure(DomainErrors.Task.NotFound);
@@ -69,7 +62,7 @@ namespace TaskManagement.Application.Tasks.UserCase
 
         public async Task<Result<TaskResponse>> GetTaskByIdAsync(TaskId taskId)
         {
-           var task = await _taskRepository.GetByIdAsync(taskId);
+           var task = await taskRepository.GetByIdAsync(taskId.Value);
             return task is null
                 ? Result<TaskResponse>.Failure(DomainErrors.Task.NotFound)
                 : Result<TaskResponse>.Success(task.ToDto());
@@ -77,87 +70,141 @@ namespace TaskManagement.Application.Tasks.UserCase
 
         public async Task<Result<List<TaskResponse>>> GetTasksByProjectIdAsync(ProjectId projectId)
         {
-            var tasks = await _taskRepository.ListTasksByProjectIdAsync(projectId);
+            var tasks = await taskRepository.ListTasksByProjectIdAsync(projectId);
 
-            return tasks is null || !tasks.Any()
+            return  tasks.Count == 0
                 ? Result<List<TaskResponse>>.Failure(DomainErrors.Task.NotFound)
                 : Result<List<TaskResponse>>.Success(tasks.Select(t => t.ToDto()).ToList());
         }
 
         public async Task<Result<TaskResponse>> ReopenTask(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.ReOpen(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.ReOpen(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
         public async Task<Result<TaskResponse>> SetHighPriority(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.HighPriority(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.HighPriority(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
-        public async Task<Result<TaskResponse>> SetLowProirity(TaskId taskId)
+        public async Task<Result<TaskResponse>> SetLowPriority(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.LowPriority(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.LowPriority(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
         public async Task<Result<TaskResponse>> SetMediumPriority(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.MediumPriority(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.MediumPriority(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
         public async Task<Result<TaskResponse>> StartTask(TaskId taskId)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.Start(_clock);
-            await _taskRepository.UpdateAsync(task);
+            task.Start(clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
         public async Task<Result<TaskResponse>> UpdateDueDate(TaskId taskId, DateTime dueDate)
         {
-            var task = await _taskRepository.GetByIdAsync(taskId);
+            var task = await taskRepository.GetByIdAsync(taskId.Value);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
-            task.UpdateDueDate(dueDate, _clock);
-            await _taskRepository.UpdateAsync(task);
+            task.UpdateDueDate(dueDate, clock);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
         }
 
         public async Task<Result<TaskResponse>> UpdateTaskAsync(UpdateTaskRequest dto)
         {
-            var task = await _taskRepository.GetByIdAsync(dto.TaskId);
+            var task = await taskRepository.GetByIdAsync(dto.TaskId);
             if (task is null)
                 return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
 
             task.UpdateDetails(
-                Title.Create(dto.newTitle),
-                Description.Create(dto.newDescription),
-                dto.updatedById,
-                _clock
+                Title.Create(dto.NewTitle),
+                Description.Create(dto.NewDescription),
+                dto.UpdatedById,
+                clock
                 );
-            await _taskRepository.UpdateAsync(task);
+            await taskRepository.UpdateAsync(task);
             return Result<TaskResponse>.Success(task.ToDto());
+        }
+        
+        public async Task<Result<TaskResponse>> AddCommentAsync(CreateCommentRequest dto)
+        {
+            var task = await taskRepository.GetByIdAsync(dto.TaskId);
+            if (task is null)
+                return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
+            task.AddComment(
+                CommentId.New(),
+                dto.UserId, 
+                CommentContent.Create(dto.CommentContent), 
+                clock
+            );
+
+            await taskRepository.UpdateAsync(task);
+
+            return Result<TaskResponse>.Success(task.ToDto());
+        }
+
+        public async Task<Result<bool>> DeleteCommentAsync(DeleteCommentRequest dto)
+        {
+            var task = await taskRepository.GetByIdAsync(dto.TaskId);
+            if (task is null)
+                return Result<bool>.Failure(DomainErrors.Task.NotFound);
+
+            task.DeleteComment(dto.CommentId, dto.DeletedById,clock);
+
+            await taskRepository.UpdateAsync(task);
+
+            return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<TaskResponse>> EditCommentAsync(UpdateCommentRequest dto)
+        {
+
+            var task = await taskRepository.GetByIdAsync(dto.TaskId);
+            if (task is null)
+                return Result<TaskResponse>.Failure(DomainErrors.Task.NotFound);
+
+            task.EditComment(dto.CommentId,CommentContent.Create(dto.NewContent), dto.UserId,  clock);
+
+            await taskRepository.UpdateAsync(task);
+
+            return Result<TaskResponse>.Success(task.ToDto());
+        }
+
+        public async Task<Result<IEnumerable<CommentResponse>>> GetCommentsByTaskIdAsync(TaskId taskId)
+        {
+            var task = await taskRepository.GetByIdAsync(taskId);
+            if (task is null)
+                return Result<IEnumerable<CommentResponse>>.Failure(DomainErrors.Task.NotFound);
+            var comments = task.Comments.Select(c => c.ToResponse());
+            return Result<IEnumerable<CommentResponse>>.Success(comments);
+
         }
     }
 }

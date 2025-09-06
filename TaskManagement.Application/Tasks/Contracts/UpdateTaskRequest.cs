@@ -11,10 +11,10 @@ namespace TaskManagement.Application.Tasks.Contracts
 {
     public record struct UpdateTaskRequest
     (
-         TaskId TaskId,
-       string newTitle,
-       string newDescription,
-       UserId updatedById
+         Guid TaskId,
+       string NewTitle,
+       string NewDescription,
+       Guid UpdatedById
     );
 
 

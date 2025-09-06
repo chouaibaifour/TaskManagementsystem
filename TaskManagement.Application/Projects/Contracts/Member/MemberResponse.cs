@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskManagement.Domain.Users.ValueObjects;
-
-namespace TaskManagement.Application.Projects.Dtos.Member
+﻿namespace TaskManagement.Application.Projects.Contracts.Member
 {
     public record struct MemberResponse(
-        UserId UserId,
+        Guid UserId,
         string Role,
         string IsActive
         );

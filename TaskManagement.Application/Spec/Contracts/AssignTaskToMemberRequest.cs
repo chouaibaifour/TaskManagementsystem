@@ -5,9 +5,9 @@ using TaskManagement.Domain.Users.ValueObjects;
 namespace TaskManagement.Application.Spec.Contracts
 {
     public record struct AssignTaskToMemberRequest(
-        ProjectId ProjectId,
-        TaskId TaskId,
-        UserId UserId
+        Guid ProjectId,
+        Guid TaskId,
+        Guid UserId
         );
 
 }
