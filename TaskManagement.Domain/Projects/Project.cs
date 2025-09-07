@@ -104,7 +104,8 @@ namespace TaskManagement.Domain.Projects
             Touch(clock);
             Raise(new ProjectChangeStatusEvent(Id ,oldStatus,newStatus,clock.UtcNow));
         }
-        private void AddMemberInternal(UserId userId,MemberRole role,IClock clock)
+
+        public void AddMember(UserId userId,MemberRole role,IClock clock)
         {
             if(role== MemberRole.Owner)
                 throw new Exception("Cannot add another Owner to the project");
@@ -122,17 +123,8 @@ namespace TaskManagement.Domain.Projects
             Raise(new ProjectMemberAddedEvent(Id, userId, role, UpdateAtUtc!.Value));
         }
 
-        public void AddMember(UserId userId, IClock clock)=>
-                AddMemberInternal(userId, MemberRole.Viewer, clock);
-
-        public void AddAdmin(UserId userId, IClock clock)=>
-                AddMemberInternal(userId, MemberRole.Admin, clock);
-
-        public void AddViewer(UserId userId, IClock clock) =>
-                AddMemberInternal(userId, MemberRole.Viewer, clock);
-
-        public void RemoveMember(UserId userId,IClock clock
-            )
+        
+        public void RemoveMember(UserId userId,IClock clock)
         {
             var member = _members.FirstOrDefault(m => m.UserId == userId );
             if (member == null)

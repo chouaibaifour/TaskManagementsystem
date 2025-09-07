@@ -16,7 +16,7 @@ namespace TaskManagement.Application.Projects.UseCase
     public class ProjectService(IProjectRepository projectRepository,
         IUserRepository userRepository,IClock clock) : IProjectService
     {
-        public async Task<Result<ProjectResponse>> ArchiveProject(Guid projectId)
+        public async Task<Result<ProjectResponse>> ArchiveProjectAsync(Guid projectId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project == null)
@@ -30,7 +30,7 @@ namespace TaskManagement.Application.Projects.UseCase
 
         }
 
-        public async Task<Result<ProjectResponse>> CompleteProject(Guid projectId)
+        public async Task<Result<ProjectResponse>> CompleteProjectAsync(Guid projectId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project == null)
@@ -93,7 +93,7 @@ namespace TaskManagement.Application.Projects.UseCase
 
         }
 
-        public async Task<Result<List<MemberResponse>>> GetProjectMembers(Guid projectId)
+        public async Task<Result<List<MemberResponse>>> GetProjectMembersAsync(Guid projectId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
 
@@ -112,7 +112,7 @@ namespace TaskManagement.Application.Projects.UseCase
             return Result<List<ProjectResponse>>.Success(projects.Select(p => p.ToDto()).ToList());
         }
 
-        public async Task<Result<ProjectResponse>> RestoreProject(Guid projectId)
+        public async Task<Result<ProjectResponse>> RestoreProjectAsync(Guid projectId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project == null)
@@ -142,7 +142,7 @@ namespace TaskManagement.Application.Projects.UseCase
             return Result<ProjectResponse>.Success(project.ToDto());
         }
         
-        public async Task<Result<ProjectResponse>> ActivateProjectMember(Guid projectId, Guid userId)
+        public async Task<Result<ProjectResponse>> ActivateProjectMemberAsync(Guid projectId, Guid userId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project is null)
@@ -157,8 +157,10 @@ namespace TaskManagement.Application.Projects.UseCase
 
             return Result<ProjectResponse>.Success(project.ToDto());
         }
+        
+        
 
-        public async Task<Result<ProjectResponse>> AddProjectMember(CreateProjectMemberRequest dto)
+        public async Task<Result<ProjectResponse>> AddProjectMemberAsync(CreateUpdateProjectMemberRequest dto)
         {
             var project = await projectRepository.GetByIdAsync(dto.ProjectId);
             if (project is null)
@@ -167,7 +169,7 @@ namespace TaskManagement.Application.Projects.UseCase
             if(await userRepository.GetByIdAsync(dto.UserId) is null)
                 return Result<ProjectResponse>.Failure(DomainErrors.User.NotFound);
 
-            project.AddMember(dto.UserId, clock);
+            project.AddMember(dto.UserId,MemberRole.FromEnum(dto.MemberRole), clock);
 
             await projectRepository.UpdateAsync(project);
 
@@ -176,7 +178,23 @@ namespace TaskManagement.Application.Projects.UseCase
 
         }
 
-        public async Task<Result<ProjectResponse>> DeactivateProjectMember(Guid projectId, Guid userId)
+        public async Task<Result<ProjectResponse>> UpdateProjectMemberAsync(CreateUpdateProjectMemberRequest dto)
+        {
+            var project = await projectRepository.GetByIdAsync(dto.ProjectId);
+            if (project is null)
+                return Result<ProjectResponse>.Failure(DomainErrors.Project.NotFound);
+
+            if(await userRepository.GetByIdAsync(dto.UserId) is null)
+                return Result<ProjectResponse>.Failure(DomainErrors.User.NotFound);
+
+            project.ChangeMemberRole(dto.UserId,MemberRole.FromEnum(dto.MemberRole), clock);
+
+            await projectRepository.UpdateAsync(project);
+
+            return Result<ProjectResponse>.Success(project.ToDto());
+        }
+
+        public async Task<Result<ProjectResponse>> DeactivateProjectMemberAsync(Guid projectId, Guid userId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project is null)
@@ -192,7 +210,7 @@ namespace TaskManagement.Application.Projects.UseCase
             return Result<ProjectResponse>.Success(project.ToDto());
         }
 
-        public async Task<Result<ProjectResponse>> RemoveProjectMember(Guid projectId, Guid userId)
+        public async Task<Result<ProjectResponse>> RemoveProjectMemberAsync(Guid projectId, Guid userId)
         {
             var project = await projectRepository.GetByIdAsync(projectId);
             if (project is null)
